@@ -1,18 +1,18 @@
 /*
-* Copyright 2012 Lars Werkman
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2012 Lars Werkman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.larswerkman.colorpicker;
 
@@ -21,6 +21,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.graphics.SweepGradient;
@@ -32,7 +33,7 @@ import android.view.View;
 
 /**
  * Displays a holo-themed color picker.
- *
+ * 
  * <p>
  * Use {@link #getColor()} to retrieve the selected color.
  * </p>
@@ -46,15 +47,15 @@ public class ColorPicker extends View {
 
 	/**
 	 * Colors to construct the color wheel using {@link SweepGradient}.
-	 *
+	 * 
 	 * <p>
-	 * Note: The algorithm in {@link #normalizeColor(int)} highly depends on these exact values. Be
-	 * aware that {@link #setColor(int)} might break if you change this array.
+	 * Note: The algorithm in {@link #normalizeColor(int)} highly depends on
+	 * these exact values. Be aware that {@link #setColor(int)} might break if
+	 * you change this array.
 	 * </p>
 	 */
-	private static final int[] COLORS = new int[] { 0xFFFF0000, 0xFFFF00FF, 0xFF0000FF, 0xFF00FFFF,
-		0xFF00FF00, 0xFFFFFF00, 0xFFFF0000 };
-
+	private static final int[] COLORS = new int[] { 0xFFFF0000, 0xFFFF00FF,
+			0xFF0000FF, 0xFF00FFFF, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000 };
 
 	/**
 	 * {@code Paint} instance used to draw the color wheel.
@@ -87,9 +88,9 @@ public class ColorPicker extends View {
 	private RectF mColorWheelRectangle = new RectF();
 
 	/**
-	 * {@code true} if the user clicked on the pointer to start the move mode. {@code false} once
-	 * the user stops touching the screen.
-	 *
+	 * {@code true} if the user clicked on the pointer to start the move mode.
+	 * {@code false} once the user stops touching the screen.
+	 * 
 	 * @see #onTouchEvent(MotionEvent)
 	 */
 	private boolean mUserIsMovingPointer = false;
@@ -101,23 +102,28 @@ public class ColorPicker extends View {
 
 	/**
 	 * Number of pixels the origin of this view is moved in X- and Y-direction.
-	 *
+	 * 
 	 * <p>
-	 * We use the center of this (quadratic) View as origin of our internal coordinate system.
-	 * Android uses the upper left corner as origin for the View-specific coordinate system. So this
-	 * is the value we use to translate from one coordinate system to the other.
+	 * We use the center of this (quadratic) View as origin of our internal
+	 * coordinate system. Android uses the upper left corner as origin for the
+	 * View-specific coordinate system. So this is the value we use to translate
+	 * from one coordinate system to the other.
 	 * </p>
-	 *
-	 * <p>Note: (Re)calculated in {@link #onMeasure(int, int)}.</p>
-	 *
+	 * 
+	 * <p>
+	 * Note: (Re)calculated in {@link #onMeasure(int, int)}.
+	 * </p>
+	 * 
 	 * @see #onDraw(Canvas)
 	 */
 	private float mTranslationOffset;
 
 	/**
 	 * Radius of the color wheel in pixels.
-	 *
-	 * <p>Note: (Re)calculated in {@link #onMeasure(int, int)}.</p>
+	 * 
+	 * <p>
+	 * Note: (Re)calculated in {@link #onMeasure(int, int)}.
+	 * </p>
 	 */
 	private float mColorWheelRadius;
 
@@ -125,7 +131,8 @@ public class ColorPicker extends View {
 	 * The pointer's position expressed as angle (in rad).
 	 */
 	private float mAngle;
-
+	private Paint textPaint;
+	private String text;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -146,12 +153,15 @@ public class ColorPicker extends View {
 		final TypedArray a = getContext().obtainStyledAttributes(attrs,
 				R.styleable.ColorPicker, defStyle, 0);
 
-		mColorWheelStrokeWidth = a.getInteger(R.styleable.ColorPicker_wheel_size, 16);
+		mColorWheelStrokeWidth = a.getInteger(
+				R.styleable.ColorPicker_wheel_size, 16);
 		mPointerRadius = a.getInteger(R.styleable.ColorPicker_pointer_size, 48);
 
 		a.recycle();
 
 		Shader s = new SweepGradient(0, 0, COLORS, null);
+
+		mAngle = (float) (-Math.PI / 2);
 
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorWheelPaint.setShader(s);
@@ -163,16 +173,22 @@ public class ColorPicker extends View {
 		mPointerHaloPaint.setStrokeWidth(5);
 		mPointerHaloPaint.setAlpha(0x60);
 
+		textPaint = new Paint();
+		textPaint.setColor(calculateColor(mAngle));
+		textPaint.setStyle(Style.FILL_AND_STROKE);
+		// canvas.drawPaint(textPaint);
+		textPaint.setTextSize(95);
+
 		mPointerColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPointerColor.setStrokeWidth(5);
-
-		mAngle = (float) (-Math.PI / 2);
+		text = "0";
 		mPointerColor.setColor(calculateColor(mAngle));
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		// All of our positions are using our internal coordinate system. Instead of translating
+		// All of our positions are using our internal coordinate system.
+		// Instead of translating
 		// them we let Canvas do the work for us.
 		canvas.translate(mTranslationOffset, mTranslationOffset);
 
@@ -182,11 +198,19 @@ public class ColorPicker extends View {
 		float[] pointerPosition = calculatePointerPosition(mAngle);
 
 		// Draw the pointer's "halo"
-		canvas.drawCircle(pointerPosition[0], pointerPosition[1], mPointerRadius, mPointerHaloPaint);
+		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
+				mPointerRadius, mPointerHaloPaint);
 
-		// Draw the pointer (the currently selected color) slightly smaller on top.
+		// Draw the pointer (the currently selected color) slightly smaller on
+		// top.
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
 				(float) (mPointerRadius / 1.2), mPointerColor);
+
+		canvas.drawText(text,
+				(mColorWheelRectangle.centerX())
+						- (textPaint.measureText(text) / 2),
+				mColorWheelRectangle.centerY() + (textPaint.getTextSize() / 2),
+				textPaint);
 	}
 
 	@Override
@@ -200,8 +224,8 @@ public class ColorPicker extends View {
 		mTranslationOffset = min * 0.5f;
 		mColorWheelRadius = mTranslationOffset - mPointerRadius;
 
-		mColorWheelRectangle.set(-mColorWheelRadius, -mColorWheelRadius, mColorWheelRadius,
-				mColorWheelRadius);
+		mColorWheelRectangle.set(-mColorWheelRadius, -mColorWheelRadius,
+				mColorWheelRadius, mColorWheelRadius);
 	}
 
 	private int ave(int s, int d, float p) {
@@ -210,11 +234,12 @@ public class ColorPicker extends View {
 
 	/**
 	 * Calculate the color using the supplied angle.
-	 *
+	 * 
 	 * @param angle
-	 *         The selected color's position expressed as angle (in rad).
-	 *
-	 * @return The ARGB value of the color on the color wheel at the specified angle.
+	 *            The selected color's position expressed as angle (in rad).
+	 * 
+	 * @return The ARGB value of the color on the color wheel at the specified
+	 *         angle.
 	 */
 	private int calculateColor(float angle) {
 		float unit = (float) (angle / (2 * Math.PI));
@@ -246,7 +271,7 @@ public class ColorPicker extends View {
 
 	/**
 	 * Get the currently selected color.
-	 *
+	 * 
 	 * @return The ARGB value of the currently selected color.
 	 */
 	public int getColor() {
@@ -255,12 +280,13 @@ public class ColorPicker extends View {
 
 	/**
 	 * Set the color to be highlighted by the pointer.
-	 *
+	 * 
 	 * @param color
-	 *         The RGB value of the color to highlight. If this is not a color displayed on the
-	 *         color wheel a very simple algorithm is used to map it to the color wheel. The
-	 *         resulting color often won't look close to the original color. This is especially true
-	 *         for shades of grey. You have been warned!
+	 *            The RGB value of the color to highlight. If this is not a
+	 *            color displayed on the color wheel a very simple algorithm is
+	 *            used to map it to the color wheel. The resulting color often
+	 *            won't look close to the original color. This is especially
+	 *            true for shades of grey. You have been warned!
 	 */
 	public void setColor(int color) {
 		mAngle = colorToAngle(color);
@@ -270,12 +296,14 @@ public class ColorPicker extends View {
 
 	/**
 	 * Convert a color to an angle.
-	 *
+	 * 
 	 * @param color
-	 *         The RGB value of the color to "find" on the color wheel. {@link #normalizeColor(int)}
-	 *         will be used to map this color to one on the color wheel if necessary.
-	 *
-	 * @return The angle (in rad) the "normalized" color is displayed on the color wheel.
+	 *            The RGB value of the color to "find" on the color wheel.
+	 *            {@link #normalizeColor(int)} will be used to map this color to
+	 *            one on the color wheel if necessary.
+	 * 
+	 * @return The angle (in rad) the "normalized" color is displayed on the
+	 *         color wheel.
 	 */
 	private float colorToAngle(int color) {
 		int[] colorInfo = normalizeColor(color);
@@ -293,7 +321,8 @@ public class ColorPicker extends View {
 				double value;
 				double decimals = ((normColor >> shiftValue) & 0xFF) / 255D;
 
-				// Find out if the gradient our color belongs to goes from the element just found to
+				// Find out if the gradient our color belongs to goes from the
+				// element just found to
 				// the next element in the array.
 				if ((nextValue & colorMask) != (anchorColor & colorMask)) {
 					// Compute value depending of the gradient direction
@@ -303,9 +332,11 @@ public class ColorPicker extends View {
 						value = i + decimals;
 					}
 				} else {
-					// It's a gradient from this element to the previous element in the array.
+					// It's a gradient from this element to the previous element
+					// in the array.
 
-					// Wrap to the end of the array if the "anchor" color is the first element.
+					// Wrap to the end of the array if the "anchor" color is the
+					// first element.
 					int index = (i == 0) ? COLORS.length - 1 : i;
 					int prevValue = COLORS[index - 1];
 
@@ -333,24 +364,26 @@ public class ColorPicker extends View {
 
 	/**
 	 * "Normalize" the supplied color.
-	 *
+	 * 
 	 * <p>
-	 * This will set the lowest value of R,G,B to 0, the highest to 255, and will keep the middle
-	 * value.<br>
-	 * For values close to those on the color wheel this will result in close matches. For other
-	 * values, especially shades of grey this will produce funny results.
+	 * This will set the lowest value of R,G,B to 0, the highest to 255, and
+	 * will keep the middle value.<br>
+	 * For values close to those on the color wheel this will result in close
+	 * matches. For other values, especially shades of grey this will produce
+	 * funny results.
 	 * </p>
-	 *
+	 * 
 	 * @param color
-	 *         The color to "normalize".
-	 *
+	 *            The color to "normalize".
+	 * 
 	 * @return An {@code int} array with the following contents:
 	 *         <ol>
-	 *           <li>The ARGB value of the "normalized" color.</li>
-	 *           <li>A mask with all bits {@code 0} but those for the byte representing the
-	 *               "middle value" that remains unchanged in the "normalized" color.</li>
-	 *           <li>The number of bits the "normalized" color has to be shifted to the right so the
-	 *               "middle value" is in the lower 8 bits.</li>
+	 *         <li>The ARGB value of the "normalized" color.</li>
+	 *         <li>A mask with all bits {@code 0} but those for the byte
+	 *         representing the "middle value" that remains unchanged in the
+	 *         "normalized" color.</li>
+	 *         <li>The number of bits the "normalized" color has to be shifted
+	 *         to the right so the "middle value" is in the lower 8 bits.</li>
 	 *         </ol>
 	 */
 	private int[] normalizeColor(int color) {
@@ -427,8 +460,10 @@ public class ColorPicker extends View {
 		case MotionEvent.ACTION_DOWN:
 			// Check whether the user pressed on (or near) the pointer
 			float[] pointerPosition = calculatePointerPosition(mAngle);
-			if (x >= (pointerPosition[0] - 48) && x <= (pointerPosition[0] + 48)
-					&& y >= (pointerPosition[1] - 48) && y <= (pointerPosition[1] + 48)) {
+			if (x >= (pointerPosition[0] - 48)
+					&& x <= (pointerPosition[0] + 48)
+					&& y >= (pointerPosition[1] - 48)
+					&& y <= (pointerPosition[1] + 48)) {
 				mUserIsMovingPointer = true;
 				invalidate();
 			}
@@ -436,7 +471,10 @@ public class ColorPicker extends View {
 		case MotionEvent.ACTION_MOVE:
 			if (mUserIsMovingPointer) {
 				mAngle = (float) java.lang.Math.atan2(y, x);
-				mPointerColor.setColor(calculateColor(mAngle));
+				// mPointerColor.setColor(calculateColor(mAngle));
+
+				textPaint.setColor(calculateColor(mAngle));
+				text = mAngle + "";
 				invalidate();
 			}
 			break;
@@ -448,12 +486,14 @@ public class ColorPicker extends View {
 	}
 
 	/**
-	 * Calculate the pointer's coordinates on the color wheel using the supplied angle.
-	 *
+	 * Calculate the pointer's coordinates on the color wheel using the supplied
+	 * angle.
+	 * 
 	 * @param angle
-	 *         The position of the pointer expressed as angle (in rad).
-	 *
-	 * @return The coordinates of the pointer's center in our internal coordinate system.
+	 *            The position of the pointer expressed as angle (in rad).
+	 * 
+	 * @return The coordinates of the pointer's center in our internal
+	 *         coordinate system.
 	 */
 	private float[] calculatePointerPosition(float angle) {
 		float x = (float) (mColorWheelRadius * Math.cos(angle));
