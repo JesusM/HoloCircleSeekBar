@@ -20,10 +20,13 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
+import android.graphics.Shader.TileMode;
 import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -54,8 +57,7 @@ public class ColorPicker extends View {
 	 * you change this array.
 	 * </p>
 	 */
-	private static final int[] COLORS = new int[] { 0xFFFF0000, 0xFFFF00FF,
-			0xFF0000FF, 0xFF00FFFF, 0xFF00FF00, 0xFFFFFF00, 0xFFFF0000 };
+	private static final int[] COLORS = new int[] { Color.DKGRAY, Color.CYAN, };
 
 	/**
 	 * {@code Paint} instance used to draw the color wheel.
@@ -137,6 +139,8 @@ public class ColorPicker extends View {
 	private int max = 100;
 	private String color_attr;
 	private int color;
+	private SweepGradient s;
+	private Paint mArcColor;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -169,20 +173,25 @@ public class ColorPicker extends View {
 			color = Color.CYAN;
 
 		a.recycle();
-
-		Shader s = new SweepGradient(0, 0, COLORS, null);
-
 		mAngle = (float) (-Math.PI / 2);
+
+		// float[] positions = { 0, 1 };
+		// s = new SweepGradient(mColorWheelRectangle.centerX(),
+		// mColorWheelRectangle.centerY(), COLORS, positions);
+		// s = new LinearGradient(0, mColorWheelRectangle.right-1, 0,
+		// mColorWheelRectangle.centerY(),
+		// 0xFF284560, Color.CYAN, TileMode.MIRROR);
 
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorWheelPaint.setShader(s);
+		// mColorWheelPaint.setColor(color);
 		mColorWheelPaint.setStyle(Paint.Style.STROKE);
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
 		mPointerHaloPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mPointerHaloPaint.setColor(color);
-		mPointerHaloPaint.setStrokeWidth(5);
-		mPointerHaloPaint.setAlpha(0x60);
+		mPointerHaloPaint.setColor(Color.DKGRAY);
+		mPointerHaloPaint.setStrokeWidth(mPointerRadius + 10);
+		mPointerHaloPaint.setAlpha(150);
 
 		textPaint = new Paint();
 		textPaint.setColor(color);
@@ -191,9 +200,15 @@ public class ColorPicker extends View {
 		textPaint.setTextSize(95);
 
 		mPointerColor = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mPointerColor.setStrokeWidth(5);
+		mPointerColor.setStrokeWidth(mPointerRadius);
 		text = conversion + "";
-		mPointerColor.setColor(calculateColor(mAngle));
+		// mPointerColor.setColor(calculateColor(mAngle));
+		mPointerColor.setColor(color);
+
+		mArcColor = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mArcColor.setColor(Color.CYAN);
+		mArcColor.setStyle(Paint.Style.STROKE);
+		mArcColor.setStrokeWidth(mColorWheelStrokeWidth + 5);
 	}
 
 	@Override
@@ -222,6 +237,8 @@ public class ColorPicker extends View {
 						- (textPaint.measureText(text) / 2),
 				mColorWheelRectangle.centerY() + (textPaint.getTextSize() / 2),
 				textPaint);
+		canvas.drawArc(mColorWheelRectangle, 270,
+				calculateRadiansFromAngle(mAngle), false, mArcColor);
 	}
 
 	@Override
@@ -296,6 +313,17 @@ public class ColorPicker extends View {
 		conversion = (int) ((unit * max) - ((max / 4) * 3));
 		if (conversion < 0)
 			conversion += max;
+		return conversion;
+	}
+
+	private int calculateRadiansFromAngle(float angle) {
+		float unit = (float) (angle / (2 * Math.PI));
+		if (unit < 0) {
+			unit += 1;
+		}
+		conversion = (int) ((unit * 360) - ((360 / 4) * 3));
+		if (conversion < 0)
+			conversion += 360;
 		return conversion;
 	}
 
