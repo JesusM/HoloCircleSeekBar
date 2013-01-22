@@ -133,6 +133,10 @@ public class ColorPicker extends View {
 	private float mAngle;
 	private Paint textPaint;
 	private String text;
+	private int conversion = 0;
+	private int max = 100;
+	private String color_attr;
+	private int color;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -156,6 +160,13 @@ public class ColorPicker extends View {
 		mColorWheelStrokeWidth = a.getInteger(
 				R.styleable.ColorPicker_wheel_size, 16);
 		mPointerRadius = a.getInteger(R.styleable.ColorPicker_pointer_size, 48);
+		max = a.getInteger(R.styleable.ColorPicker_max, 100);
+
+		color_attr = a.getString(R.styleable.ColorPicker_color);
+		if (color_attr != null)
+			color = Color.parseColor(color_attr);
+		else
+			color = Color.CYAN;
 
 		a.recycle();
 
@@ -169,19 +180,19 @@ public class ColorPicker extends View {
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
 		mPointerHaloPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mPointerHaloPaint.setColor(Color.BLACK);
+		mPointerHaloPaint.setColor(color);
 		mPointerHaloPaint.setStrokeWidth(5);
 		mPointerHaloPaint.setAlpha(0x60);
 
 		textPaint = new Paint();
-		textPaint.setColor(calculateColor(mAngle));
+		textPaint.setColor(color);
 		textPaint.setStyle(Style.FILL_AND_STROKE);
 		// canvas.drawPaint(textPaint);
 		textPaint.setTextSize(95);
 
 		mPointerColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPointerColor.setStrokeWidth(5);
-		text = "0";
+		text = conversion + "";
 		mPointerColor.setColor(calculateColor(mAngle));
 	}
 
@@ -205,7 +216,7 @@ public class ColorPicker extends View {
 		// top.
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
 				(float) (mPointerRadius / 1.2), mPointerColor);
-
+		text = String.valueOf(calculateTextFromAngle(mAngle));
 		canvas.drawText(text,
 				(mColorWheelRectangle.centerX())
 						- (textPaint.measureText(text) / 2),
@@ -248,13 +259,18 @@ public class ColorPicker extends View {
 		}
 
 		if (unit <= 0) {
+			// conversion = COLORS[0];
 			return COLORS[0];
 		}
 		if (unit >= 1) {
+			// conversion = COLORS[COLORS.length - 1];
 			return COLORS[COLORS.length - 1];
 		}
 
 		float p = unit * (COLORS.length - 1);
+		float q = unit * max;
+		int j = (int) q;
+		// conversion -= j;
 		int i = (int) p;
 		p -= i;
 
@@ -266,7 +282,21 @@ public class ColorPicker extends View {
 		int b = ave(Color.blue(c0), Color.blue(c1), p);
 
 		mColor = Color.argb(a, r, g, b);
+		// int minus = (max / 4);
+		// int m2 = minus * 3;
+
 		return Color.argb(a, r, g, b);
+	}
+
+	private int calculateTextFromAngle(float angle) {
+		float unit = (float) (angle / (2 * Math.PI));
+		if (unit < 0) {
+			unit += 1;
+		}
+		conversion = (int) ((unit * max) - ((max / 4) * 3));
+		if (conversion < 0)
+			conversion += max;
+		return conversion;
 	}
 
 	/**
@@ -473,8 +503,9 @@ public class ColorPicker extends View {
 				mAngle = (float) java.lang.Math.atan2(y, x);
 				// mPointerColor.setColor(calculateColor(mAngle));
 
-				textPaint.setColor(calculateColor(mAngle));
-				text = mAngle + "";
+				// textPaint.setColor(calculateColor(mAngle));
+				// text = conversion + "";
+
 				invalidate();
 			}
 			break;
