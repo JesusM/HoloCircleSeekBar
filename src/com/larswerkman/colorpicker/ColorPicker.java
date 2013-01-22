@@ -144,7 +144,7 @@ public class ColorPicker extends View {
 	private String wheel_color_attr, wheel_unactive_color_attr,
 			pointer_color_attr, pointer_halo_color_attr, text_color_attr;
 	private int wheel_color, unactive_wheel_color, pointer_color,
-			pointer_halo_color, text_size, text_color;
+			pointer_halo_color, text_size, text_color, init_position;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -169,13 +169,6 @@ public class ColorPicker extends View {
 
 		a.recycle();
 		mAngle = (float) (-Math.PI / 2);
-
-		// float[] positions = { 0, 1 };
-		// s = new SweepGradient(mColorWheelRectangle.centerX(),
-		// mColorWheelRectangle.centerY(), COLORS, positions);
-		// s = new LinearGradient(0, mColorWheelRectangle.right-1, 0,
-		// mColorWheelRectangle.centerY(),
-		// 0xFF284560, Color.CYAN, TileMode.MIRROR);
 
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorWheelPaint.setShader(s);
@@ -211,6 +204,7 @@ public class ColorPicker extends View {
 				R.styleable.ColorPicker_wheel_size, 16);
 		mPointerRadius = a.getInteger(R.styleable.ColorPicker_pointer_size, 48);
 		max = a.getInteger(R.styleable.ColorPicker_max, 100);
+		init_position = a.getInteger(R.styleable.ColorPicker_init_position, 0);
 
 		color_attr = a.getString(R.styleable.ColorPicker_color);
 		wheel_color_attr = a
@@ -240,11 +234,11 @@ public class ColorPicker extends View {
 			try {
 				wheel_color = Color.parseColor(wheel_color_attr);
 			} catch (IllegalArgumentException e) {
-				wheel_color = Color.TRANSPARENT;
+				wheel_color = Color.DKGRAY;
 			}
 
 		} else {
-
+			wheel_color = Color.DKGRAY;
 		}
 		if (wheel_unactive_color_attr != null) {
 			try {
@@ -273,7 +267,7 @@ public class ColorPicker extends View {
 			try {
 				pointer_halo_color = Color.parseColor(pointer_halo_color_attr);
 			} catch (IllegalArgumentException e) {
-				pointer_halo_color = Color.DKGRAY;
+				pointer_halo_color = Color.CYAN;
 			}
 
 		} else {
@@ -382,8 +376,6 @@ public class ColorPicker extends View {
 		int b = ave(Color.blue(c0), Color.blue(c1), p);
 
 		mColor = Color.argb(a, r, g, b);
-		// int minus = (max / 4);
-		// int m2 = minus * 3;
 
 		return Color.argb(a, r, g, b);
 	}
@@ -404,9 +396,18 @@ public class ColorPicker extends View {
 		if (unit < 0) {
 			unit += 1;
 		}
-		conversion = (int) ((unit * 360) - ((360 / 4) * 3));
-		if (conversion < 0)
-			conversion += 360;
+		int radians = (int) ((unit * 360) - ((360 / 4) * 3));
+		if (radians < 0)
+			radians += 360;
+		return radians;
+	}
+
+	/**
+	 * Get the selected value
+	 * 
+	 * @return the value between 0 and max
+	 */
+	public int getValue() {
 		return conversion;
 	}
 
