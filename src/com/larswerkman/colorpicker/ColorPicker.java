@@ -141,6 +141,8 @@ public class ColorPicker extends View {
 	private int color;
 	private SweepGradient s;
 	private Paint mArcColor;
+	private String wheel_color_attr;
+	private int wheel_color;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -167,10 +169,16 @@ public class ColorPicker extends View {
 		max = a.getInteger(R.styleable.ColorPicker_max, 100);
 
 		color_attr = a.getString(R.styleable.ColorPicker_color);
+		wheel_color_attr = a.getString(R.styleable.ColorPicker_wheelcolor);
 		if (color_attr != null)
 			color = Color.parseColor(color_attr);
 		else
 			color = Color.CYAN;
+
+		if (wheel_color_attr != null)
+			wheel_color = Color.parseColor(wheel_color_attr);
+		else
+			wheel_color = Color.TRANSPARENT;
 
 		a.recycle();
 		mAngle = (float) (-Math.PI / 2);
@@ -184,7 +192,7 @@ public class ColorPicker extends View {
 
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorWheelPaint.setShader(s);
-		// mColorWheelPaint.setColor(color);
+		mColorWheelPaint.setColor(wheel_color);
 		mColorWheelPaint.setStyle(Paint.Style.STROKE);
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
@@ -208,7 +216,7 @@ public class ColorPicker extends View {
 		mArcColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mArcColor.setColor(Color.CYAN);
 		mArcColor.setStyle(Paint.Style.STROKE);
-		mArcColor.setStrokeWidth(mColorWheelStrokeWidth + 5);
+		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
 	}
 
 	@Override

@@ -6,6 +6,7 @@
         <attr name="pointer_size" format="integer" />
         <attr name="max" format="integer"></attr>
         <attr name="color" format="string"></attr>
+        <attr name="wheelcolor" format="string"></attr>
     </declare-styleable>
 
 </resources>
