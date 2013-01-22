@@ -141,8 +141,10 @@ public class ColorPicker extends View {
 	private int color;
 	private SweepGradient s;
 	private Paint mArcColor;
-	private String wheel_color_attr, wheel_unactive_color_attr;
-	private int wheel_color, unactive_wheel_color;
+	private String wheel_color_attr, wheel_unactive_color_attr,
+			pointer_color_attr, pointer_halo_color_attr, text_color_attr;
+	private int wheel_color, unactive_wheel_color, pointer_color,
+			pointer_halo_color, text_size, text_color;
 
 	public ColorPicker(Context context) {
 		super(context);
@@ -163,30 +165,7 @@ public class ColorPicker extends View {
 		final TypedArray a = getContext().obtainStyledAttributes(attrs,
 				R.styleable.ColorPicker, defStyle, 0);
 
-		mColorWheelStrokeWidth = a.getInteger(
-				R.styleable.ColorPicker_wheel_size, 16);
-		mPointerRadius = a.getInteger(R.styleable.ColorPicker_pointer_size, 48);
-		max = a.getInteger(R.styleable.ColorPicker_max, 100);
-
-		color_attr = a.getString(R.styleable.ColorPicker_color);
-		wheel_color_attr = a
-				.getString(R.styleable.ColorPicker_wheel_active_color);
-		wheel_unactive_color_attr = a
-				.getString(R.styleable.ColorPicker_wheel_unactive_color);
-		if (color_attr != null)
-			color = Color.parseColor(color_attr);
-		else
-			color = Color.CYAN;
-
-		if (wheel_color_attr != null)
-			wheel_color = Color.parseColor(wheel_color_attr);
-		else
-			wheel_color = Color.TRANSPARENT;
-
-		if (wheel_unactive_color_attr != null)
-			unactive_wheel_color = Color.parseColor(wheel_unactive_color_attr);
-		else
-			unactive_wheel_color = Color.CYAN;
+		initAttributes(a);
 
 		a.recycle();
 		mAngle = (float) (-Math.PI / 2);
@@ -205,26 +184,112 @@ public class ColorPicker extends View {
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
 		mPointerHaloPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mPointerHaloPaint.setColor(Color.DKGRAY);
+		mPointerHaloPaint.setColor(pointer_halo_color);
 		mPointerHaloPaint.setStrokeWidth(mPointerRadius + 10);
-		mPointerHaloPaint.setAlpha(150);
+		// mPointerHaloPaint.setAlpha(150);
 
 		textPaint = new Paint();
-		textPaint.setColor(color);
+		textPaint.setColor(text_color);
 		textPaint.setStyle(Style.FILL_AND_STROKE);
 		// canvas.drawPaint(textPaint);
-		textPaint.setTextSize(95);
+		textPaint.setTextSize(text_size);
 
 		mPointerColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPointerColor.setStrokeWidth(mPointerRadius);
 		text = conversion + "";
 		// mPointerColor.setColor(calculateColor(mAngle));
-		mPointerColor.setColor(color);
+		mPointerColor.setColor(pointer_color);
 
 		mArcColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mArcColor.setColor(wheel_color);
 		mArcColor.setStyle(Paint.Style.STROKE);
 		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
+	}
+
+	private void initAttributes(TypedArray a) {
+		mColorWheelStrokeWidth = a.getInteger(
+				R.styleable.ColorPicker_wheel_size, 16);
+		mPointerRadius = a.getInteger(R.styleable.ColorPicker_pointer_size, 48);
+		max = a.getInteger(R.styleable.ColorPicker_max, 100);
+
+		color_attr = a.getString(R.styleable.ColorPicker_color);
+		wheel_color_attr = a
+				.getString(R.styleable.ColorPicker_wheel_active_color);
+		wheel_unactive_color_attr = a
+				.getString(R.styleable.ColorPicker_wheel_unactive_color);
+		pointer_color_attr = a.getString(R.styleable.ColorPicker_pointer_color);
+		pointer_halo_color_attr = a
+				.getString(R.styleable.ColorPicker_pointer_halo_color);
+
+		text_color_attr = a.getString(R.styleable.ColorPicker_text_color);
+
+		text_size = a.getInteger(R.styleable.ColorPicker_text_size, 95);
+
+		if (color_attr != null) {
+			try {
+				color = Color.parseColor(color_attr);
+			} catch (IllegalArgumentException e) {
+				color = Color.CYAN;
+			}
+			color = Color.parseColor(color_attr);
+		} else {
+			color = Color.CYAN;
+		}
+
+		if (wheel_color_attr != null) {
+			try {
+				wheel_color = Color.parseColor(wheel_color_attr);
+			} catch (IllegalArgumentException e) {
+				wheel_color = Color.TRANSPARENT;
+			}
+
+		} else {
+
+		}
+		if (wheel_unactive_color_attr != null) {
+			try {
+				unactive_wheel_color = Color
+						.parseColor(wheel_unactive_color_attr);
+			} catch (IllegalArgumentException e) {
+				unactive_wheel_color = Color.CYAN;
+			}
+
+		} else {
+			unactive_wheel_color = Color.CYAN;
+		}
+
+		if (pointer_color_attr != null) {
+			try {
+				pointer_color = Color.parseColor(pointer_color_attr);
+			} catch (IllegalArgumentException e) {
+				pointer_color = Color.CYAN;
+			}
+
+		} else {
+			pointer_color = Color.CYAN;
+		}
+
+		if (pointer_halo_color_attr != null) {
+			try {
+				pointer_halo_color = Color.parseColor(pointer_halo_color_attr);
+			} catch (IllegalArgumentException e) {
+				pointer_halo_color = Color.DKGRAY;
+			}
+
+		} else {
+			pointer_halo_color = Color.DKGRAY;
+		}
+
+		if (text_color_attr != null) {
+			try {
+				text_color = Color.parseColor(text_color_attr);
+			} catch (IllegalArgumentException e) {
+				text_color = Color.CYAN;
+			}
+		} else {
+			text_color = Color.CYAN;
+		}
+
 	}
 
 	@Override
@@ -236,6 +301,9 @@ public class ColorPicker extends View {
 
 		// Draw the color wheel.
 		canvas.drawOval(mColorWheelRectangle, mColorWheelPaint);
+
+		canvas.drawArc(mColorWheelRectangle, 270,
+				calculateRadiansFromAngle(mAngle), false, mArcColor);
 
 		float[] pointerPosition = calculatePointerPosition(mAngle);
 
@@ -253,8 +321,7 @@ public class ColorPicker extends View {
 						- (textPaint.measureText(text) / 2),
 				mColorWheelRectangle.centerY() + (textPaint.getTextSize() / 2),
 				textPaint);
-		canvas.drawArc(mColorWheelRectangle, 270,
-				calculateRadiansFromAngle(mAngle), false, mArcColor);
+
 	}
 
 	@Override
