@@ -13,7 +13,7 @@ Add this to your xml
                 android:layout_width="285dp"
         android:layout_height="290dp"/>
         
-To change the thickness of the wheel and the pointer you can add this.
+You can change some widget components (text size, wheel color, point color, etc) sith this attrs.
  
  	 app:max="100"
      app:pointer_color="#0174DF"
