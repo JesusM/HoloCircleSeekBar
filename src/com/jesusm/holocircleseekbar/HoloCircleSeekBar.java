@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.larswerkman.colorpicker;
+package com.jesusm.holocircleseekbar;
 
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
-import android.graphics.RadialGradient;
 import android.graphics.RectF;
-import android.graphics.Shader;
-import android.graphics.Shader.TileMode;
 import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -41,7 +37,7 @@ import android.view.View;
  * Use {@link #getColor()} to retrieve the selected color.
  * </p>
  */
-public class ColorPicker extends View {
+public class HoloCircleSeekBar extends View {
 	/*
 	 * Constants used to save/restore the instance state.
 	 */
@@ -146,29 +142,29 @@ public class ColorPicker extends View {
 	private int wheel_color, unactive_wheel_color, pointer_color,
 			pointer_halo_color, text_size, text_color, init_position;
 
-	public ColorPicker(Context context) {
+	public HoloCircleSeekBar(Context context) {
 		super(context);
 		init(null, 0);
 	}
 
-	public ColorPicker(Context context, AttributeSet attrs) {
+	public HoloCircleSeekBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init(attrs, 0);
 	}
 
-	public ColorPicker(Context context, AttributeSet attrs, int defStyle) {
+	public HoloCircleSeekBar(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		init(attrs, defStyle);
 	}
 
 	private void init(AttributeSet attrs, int defStyle) {
 		final TypedArray a = getContext().obtainStyledAttributes(attrs,
-				R.styleable.ColorPicker, defStyle, 0);
+				R.styleable.HoloCircleSeekBar, defStyle, 0);
 
 		initAttributes(a);
 
 		a.recycle();
-		mAngle = (float) (-Math.PI / 2);
+		// mAngle = (float) (-Math.PI / 2);
 
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorWheelPaint.setShader(s);
@@ -197,27 +193,35 @@ public class ColorPicker extends View {
 		mArcColor.setColor(wheel_color);
 		mArcColor.setStyle(Paint.Style.STROKE);
 		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
+
+		invalidate();
 	}
 
 	private void initAttributes(TypedArray a) {
 		mColorWheelStrokeWidth = a.getInteger(
-				R.styleable.ColorPicker_wheel_size, 16);
-		mPointerRadius = a.getInteger(R.styleable.ColorPicker_pointer_size, 48);
-		max = a.getInteger(R.styleable.ColorPicker_max, 100);
-		init_position = a.getInteger(R.styleable.ColorPicker_init_position, 0);
+				R.styleable.HoloCircleSeekBar_wheel_size, 16);
+		mPointerRadius = a.getInteger(
+				R.styleable.HoloCircleSeekBar_pointer_size, 48);
+		max = a.getInteger(R.styleable.HoloCircleSeekBar_max, 100);
 
-		color_attr = a.getString(R.styleable.ColorPicker_color);
+		color_attr = a.getString(R.styleable.HoloCircleSeekBar_color);
 		wheel_color_attr = a
-				.getString(R.styleable.ColorPicker_wheel_active_color);
+				.getString(R.styleable.HoloCircleSeekBar_wheel_active_color);
 		wheel_unactive_color_attr = a
-				.getString(R.styleable.ColorPicker_wheel_unactive_color);
-		pointer_color_attr = a.getString(R.styleable.ColorPicker_pointer_color);
+				.getString(R.styleable.HoloCircleSeekBar_wheel_unactive_color);
+		pointer_color_attr = a
+				.getString(R.styleable.HoloCircleSeekBar_pointer_color);
 		pointer_halo_color_attr = a
-				.getString(R.styleable.ColorPicker_pointer_halo_color);
+				.getString(R.styleable.HoloCircleSeekBar_pointer_halo_color);
 
-		text_color_attr = a.getString(R.styleable.ColorPicker_text_color);
+		text_color_attr = a.getString(R.styleable.HoloCircleSeekBar_text_color);
 
-		text_size = a.getInteger(R.styleable.ColorPicker_text_size, 95);
+		text_size = a.getInteger(R.styleable.HoloCircleSeekBar_text_size, 95);
+
+		init_position = a.getInteger(
+				R.styleable.HoloCircleSeekBar_init_position, 0);
+
+		mAngle = (float) calculateAngleFromText(init_position);
 
 		if (color_attr != null) {
 			try {
@@ -385,10 +389,24 @@ public class ColorPicker extends View {
 		if (unit < 0) {
 			unit += 1;
 		}
-		conversion = (int) ((unit * max) - ((max / 4) * 3));
+		int conversion = (int) ((unit * max) - ((max / 4) * 3));
 		if (conversion < 0)
 			conversion += max;
 		return conversion;
+	}
+
+	private double calculateAngleFromText(int position) {
+		if (position == 0 || position >= max)
+			return (float) (-Math.PI / 2);
+
+		float n = (((max / 4) * 3) + position);
+
+		float u = n / max;
+
+		double y = (u * (2 * Math.PI));
+
+		return y;
+
 	}
 
 	private int calculateRadiansFromAngle(float angle) {

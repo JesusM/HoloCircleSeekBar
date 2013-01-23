@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ColorPicker">
+    <declare-styleable name="HoloCircleSeekBar">
         <attr name="wheel_size" format="integer" />
         <attr name="pointer_size" format="integer" />
         <attr name="max" format="integer"></attr>
         <attr name="text_size" format="integer"></attr>
-         <attr name="init_position" format="integer"></attr>
+        <attr name="init_position" format="integer"></attr>
         <attr name="color" format="string"></attr>
         <attr name="wheel_active_color" format="string"></attr>
         <attr name="wheel_unactive_color" format="string"></attr>

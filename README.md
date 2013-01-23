@@ -1,6 +1,6 @@
-<h1>Android Holo ColorPicker</h1>
+<h1>Android HoloCircleSeekBar</h1>
 
-A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz.
+A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz and developed by Lars Werkman.
 
 ![image](https://lh3.googleusercontent.com/-RzpEyLl-1xM/UOMyztql1gI/AAAAAAAAATs/UKBuqZZtaZw//HoloColorPickerFramed1.png)
 ![image](https://lh4.googleusercontent.com/-sXAPd8onJ_8/UOMyzjA6c4I/AAAAAAAAATo/DY4kIzo7TtU//HoloColorPickerFramed2.png)
@@ -9,25 +9,31 @@ A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz.
 <h2>Documentation</h2>
 Add this to your xml
 
-	<com.larswerkman.colorpicker.ColorPicker
+	<com.jesusm.holocircleseekbar.HoloCircleSeekBar
         android:id="@+id/picker"
                 android:layout_width="285dp"
         android:layout_height="290dp"/>
         
 To change the thickness of the wheel and the pointer you can add this.
  
- 	app:wheel_size="2"
-    app:pointer_size="4"
+ 	 app:max="100"
+     app:pointer_color="#0174DF"
+     app:pointer_halo_color="#88252525"
+     app:pointer_size="34"
+     app:text_color="#FF0000"
+     app:text_size="65"
+     app:wheel_active_color="#00BFFF"
+     app:wheel_unactive_color="#FFCCCCCC" 
 
-To get the color of the colorpicker
+To get the value of the circle seekbar
 
-	ColorPicker picker = (ColorPicker) findViewById(R.id.picker);
+	HoloSeekBar picker = (HoloSeekBar) findViewById(R.id.picker);
 	
-	picker.getColor();
+	picker.getValue();
 	
 <H2>License</H2>
 	
- 	 Copyright 2012 Lars Werkman
+ 	 Copyright 2012 Jesús Manzano
  	
  	 Licensed under the Apache License, Version 2.0 (the 	"License");
  	 you may not use this file except in compliance with 	the License.
@@ -41,6 +47,9 @@ To get the color of the colorpicker
  	 See the License for the specific language governing 	permissions and
  	 limitations under the License.
  	
+ 	
+<h2>Original by</h2>
+**Lars Werkman**
 
 <h2>Devoleped By</h2>
-**Lars Werkman**
+**Jesús Manzano**
