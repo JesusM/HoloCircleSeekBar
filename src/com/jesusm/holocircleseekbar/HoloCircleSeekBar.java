@@ -27,6 +27,7 @@ import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -141,6 +142,12 @@ public class HoloCircleSeekBar extends View {
 			pointer_color_attr, pointer_halo_color_attr, text_color_attr;
 	private int wheel_color, unactive_wheel_color, pointer_color,
 			pointer_halo_color, text_size, text_color, init_position;
+	private boolean block_end = false;
+	private float lastX;
+	private int last_radians = 0;
+	private boolean block_start = false;
+	private int arc_finish_radians;
+	private float[] pointerPosition;
 
 	public HoloCircleSeekBar(Context context) {
 		super(context);
@@ -185,7 +192,7 @@ public class HoloCircleSeekBar extends View {
 
 		mPointerColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPointerColor.setStrokeWidth(mPointerRadius);
-		text = conversion + "";
+
 		// mPointerColor.setColor(calculateColor(mAngle));
 		mPointerColor.setColor(pointer_color);
 
@@ -193,6 +200,10 @@ public class HoloCircleSeekBar extends View {
 		mArcColor.setColor(wheel_color);
 		mArcColor.setStyle(Paint.Style.STROKE);
 		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
+
+		arc_finish_radians = (int) calculateAngleFromText(init_position) - 90;
+		mAngle = calculateAngleFromRadians(arc_finish_radians );
+		text = String.valueOf(calculateTextFromAngle(arc_finish_radians));
 
 		invalidate();
 	}
@@ -221,7 +232,7 @@ public class HoloCircleSeekBar extends View {
 		init_position = a.getInteger(
 				R.styleable.HoloCircleSeekBar_init_position, 0);
 
-		mAngle = (float) calculateAngleFromText(init_position);
+		// mAngle = (float) calculateAngleFromText(init_position);
 
 		if (color_attr != null) {
 			try {
@@ -295,15 +306,14 @@ public class HoloCircleSeekBar extends View {
 		// All of our positions are using our internal coordinate system.
 		// Instead of translating
 		// them we let Canvas do the work for us.
+
 		canvas.translate(mTranslationOffset, mTranslationOffset);
 
 		// Draw the color wheel.
 		canvas.drawOval(mColorWheelRectangle, mColorWheelPaint);
 
-		canvas.drawArc(mColorWheelRectangle, 270,
-				calculateRadiansFromAngle(mAngle), false, mArcColor);
-
-		float[] pointerPosition = calculatePointerPosition(mAngle);
+		canvas.drawArc(mColorWheelRectangle, 270, arc_finish_radians, false,
+				mArcColor);
 
 		// Draw the pointer's "halo"
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
@@ -313,12 +323,16 @@ public class HoloCircleSeekBar extends View {
 		// top.
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
 				(float) (mPointerRadius / 1.2), mPointerColor);
-		text = String.valueOf(calculateTextFromAngle(mAngle));
+
 		canvas.drawText(text,
 				(mColorWheelRectangle.centerX())
 						- (textPaint.measureText(text) / 2),
 				mColorWheelRectangle.centerY() + (textPaint.getTextSize() / 2),
 				textPaint);
+
+		// last_radians = calculateRadiansFromAngle(mAngle);
+
+		Log.d("HoloCircleSeekBar", "last radians: " + last_radians);
 
 	}
 
@@ -335,6 +349,9 @@ public class HoloCircleSeekBar extends View {
 
 		mColorWheelRectangle.set(-mColorWheelRadius, -mColorWheelRadius,
 				mColorWheelRadius, mColorWheelRadius);
+
+		pointerPosition = calculatePointerPosition(mAngle);
+
 	}
 
 	private int ave(int s, int d, float p) {
@@ -385,27 +402,30 @@ public class HoloCircleSeekBar extends View {
 	}
 
 	private int calculateTextFromAngle(float angle) {
-		float unit = (float) (angle / (2 * Math.PI));
-		if (unit < 0) {
-			unit += 1;
-		}
-		int conversion = (int) ((unit * max) - ((max / 4) * 3));
-		if (conversion < 0)
-			conversion += max;
-		return conversion;
+		float m = angle;
+
+		float f = (float) (360 / m);
+
+		return (int) (max / f);
 	}
 
 	private double calculateAngleFromText(int position) {
 		if (position == 0 || position >= max)
-			return (float) (-Math.PI / 2);
+			return (float) 90;
 
-		float n = (((max / 4) * 3) + position);
+		int f = max / position;
 
-		float u = n / max;
+		int f_r = 360 / f;
 
-		double y = (u * (2 * Math.PI));
+		double ang = f_r + 90;
 
-		return y;
+		// float n = (((max / 4) * 3) + position);
+		//
+		// float u = n / max;
+		//
+		// double y = (u * (2 * Math.PI));
+
+		return ang;
 
 	}
 
@@ -418,6 +438,10 @@ public class HoloCircleSeekBar extends View {
 		if (radians < 0)
 			radians += 360;
 		return radians;
+	}
+
+	private float calculateAngleFromRadians(int radians) {
+		return (float) (((radians + 270) * (2 * Math.PI)) / 360);
 	}
 
 	/**
@@ -619,30 +643,72 @@ public class HoloCircleSeekBar extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			// Check whether the user pressed on (or near) the pointer
-			float[] pointerPosition = calculatePointerPosition(mAngle);
-			if (x >= (pointerPosition[0] - 48)
-					&& x <= (pointerPosition[0] + 48)
-					&& y >= (pointerPosition[1] - 48)
-					&& y <= (pointerPosition[1] + 48)) {
-				mUserIsMovingPointer = true;
-				invalidate();
-			}
+			mAngle = (float) java.lang.Math.atan2(y, x);
+
+			block_end = false;
+			block_start = false;
+			mUserIsMovingPointer = true;
+
+			arc_finish_radians = calculateRadiansFromAngle(mAngle);
+			text = String.valueOf(calculateTextFromAngle(arc_finish_radians));
+			pointerPosition = calculatePointerPosition(mAngle);
+			invalidate();
 			break;
 		case MotionEvent.ACTION_MOVE:
 			if (mUserIsMovingPointer) {
 				mAngle = (float) java.lang.Math.atan2(y, x);
-				// mPointerColor.setColor(calculateColor(mAngle));
 
-				// textPaint.setColor(calculateColor(mAngle));
-				// text = conversion + "";
+				int radians = calculateRadiansFromAngle(mAngle);
 
+				if ((radians >= 0 && radians <= (360 / 4)
+						&& last_radians <= 359
+						&& last_radians >= ((360 / 4) * 3) && x > lastX)) {
+
+					if (!block_end && !block_start)
+						block_end = true;
+					if (block_start)
+						block_start = false;
+				} else if (last_radians >= 0 && last_radians <= (360 / 4)
+						&& radians <= 359 && radians >= ((360 / 4) * 3)
+						&& x < lastX) {
+					if (!block_start && !block_end)
+						block_start = true;
+					if (block_end)
+						block_end = false;
+
+				}
+
+				if (block_end == false && block_start == false) {
+
+				} else {
+
+				}
+
+				if (block_end) {
+					text = String.valueOf(max);
+					arc_finish_radians = 359;
+				} else if (block_start) {
+					text = String.valueOf(0);
+					arc_finish_radians = 0;
+				} else {
+					// text = String.valueOf(calculateTextFromAngle(mAngle));
+					arc_finish_radians = calculateRadiansFromAngle(mAngle);
+					text = String
+							.valueOf(calculateTextFromAngle(arc_finish_radians));
+					pointerPosition = calculatePointerPosition(mAngle);
+				}
 				invalidate();
+
+				last_radians = radians;
+
 			}
 			break;
 		case MotionEvent.ACTION_UP:
 			mUserIsMovingPointer = false;
 			break;
 		}
+
+		lastX = x;
 		return true;
 	}
 
