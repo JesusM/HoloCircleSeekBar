@@ -710,7 +710,10 @@ public class HoloCircleSeekBar extends View {
 			mUserIsMovingPointer = false;
 			break;
 		}
-
+		// Fix scrolling
+		if (event.getAction() == MotionEvent.ACTION_MOVE && getParent() != null) {
+			getParent().requestDisallowInterceptTouchEvent(true);
+		}
 		lastX = x;
 		return true;
 	}
