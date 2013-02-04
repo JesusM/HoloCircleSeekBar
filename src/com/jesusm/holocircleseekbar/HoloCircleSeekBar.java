@@ -44,6 +44,7 @@ public class HoloCircleSeekBar extends View {
 	 */
 	private static final String STATE_PARENT = "parent";
 	private static final String STATE_ANGLE = "angle";
+	private OnCircleSeekBarChangeListener mOnCircleSeekBarChangeListener;
 
 	/**
 	 * Colors to construct the color wheel using {@link SweepGradient}.
@@ -202,7 +203,7 @@ public class HoloCircleSeekBar extends View {
 		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
 
 		arc_finish_radians = (int) calculateAngleFromText(init_position) - 90;
-		mAngle = calculateAngleFromRadians(arc_finish_radians );
+		mAngle = calculateAngleFromRadians(arc_finish_radians);
 		text = String.valueOf(calculateTextFromAngle(arc_finish_radians));
 
 		invalidate();
@@ -698,6 +699,8 @@ public class HoloCircleSeekBar extends View {
 					pointerPosition = calculatePointerPosition(mAngle);
 				}
 				invalidate();
+				mOnCircleSeekBarChangeListener.onProgressChanged(this,
+						Integer.parseInt(text), true);
 
 				last_radians = radians;
 
@@ -750,4 +753,16 @@ public class HoloCircleSeekBar extends View {
 		mAngle = savedState.getFloat(STATE_ANGLE);
 		mPointerColor.setColor(calculateColor(mAngle));
 	}
+
+	public void setOnSeekBarChangeListener(OnCircleSeekBarChangeListener l) {
+		mOnCircleSeekBarChangeListener = l;
+	}
+
+	public interface OnCircleSeekBarChangeListener {
+
+		public abstract void onProgressChanged(HoloCircleSeekBar seekBar,
+				int progress, boolean fromUser);
+
+	}
+
 }
