@@ -12,6 +12,10 @@ Add this to your xml
         android:id="@+id/picker"
                 android:layout_width="285dp"
         android:layout_height="290dp"/>
+
+Don't forget to add this at the root of your View in the xml layout when you use HoloCircleSeekBar:
+
+	xmlns:app="http://schemas.android.com/apk/res-auto"
         
 You can change some widget components (text size, wheel color, point color, etc) sith this attrs.
  
