@@ -21,7 +21,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SweepGradient;
 import android.os.Bundle;
@@ -149,6 +151,9 @@ public class HoloCircleSeekBar extends View {
 	private boolean block_start = false;
 	private int arc_finish_radians;
 	private float[] pointerPosition;
+	private Paint mColorCenterHalo;
+	private RectF mColorCenterHaloRectangle = new RectF();
+	private Paint mCircleTextColor;
 
 	public HoloCircleSeekBar(Context context) {
 		super(context);
@@ -180,14 +185,22 @@ public class HoloCircleSeekBar extends View {
 		mColorWheelPaint.setStyle(Paint.Style.STROKE);
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
+		mColorCenterHalo = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mColorCenterHalo.setColor(Color.CYAN);
+		mColorCenterHalo.setAlpha(0xCC);
+		// mColorCenterHalo.setStyle(Paint.Style.STROKE);
+		// mColorCenterHalo.setStrokeWidth(mColorCenterHaloRectangle.width() /
+		// 2);
+
 		mPointerHaloPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPointerHaloPaint.setColor(pointer_halo_color);
 		mPointerHaloPaint.setStrokeWidth(mPointerRadius + 10);
 		// mPointerHaloPaint.setAlpha(150);
 
-		textPaint = new Paint();
+		textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
 		textPaint.setColor(text_color);
 		textPaint.setStyle(Style.FILL_AND_STROKE);
+		textPaint.setTextAlign(Align.LEFT);
 		// canvas.drawPaint(textPaint);
 		textPaint.setTextSize(text_size);
 
@@ -201,6 +214,10 @@ public class HoloCircleSeekBar extends View {
 		mArcColor.setColor(wheel_color);
 		mArcColor.setStyle(Paint.Style.STROKE);
 		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
+
+		mCircleTextColor = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mCircleTextColor.setColor(Color.WHITE);
+		mCircleTextColor.setStyle(Paint.Style.FILL);
 
 		arc_finish_radians = (int) calculateAngleFromText(init_position) - 90;
 		mAngle = calculateAngleFromRadians(arc_finish_radians);
@@ -316,6 +333,9 @@ public class HoloCircleSeekBar extends View {
 		canvas.drawArc(mColorWheelRectangle, 270, arc_finish_radians, false,
 				mArcColor);
 
+		// canvas.drawArc(mColorCenterHaloRectangle, 270, arc_finish_radians,
+		// false, mColorCenterHalo);
+
 		// Draw the pointer's "halo"
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
 				mPointerRadius, mPointerHaloPaint);
@@ -324,12 +344,15 @@ public class HoloCircleSeekBar extends View {
 		// top.
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
 				(float) (mPointerRadius / 1.2), mPointerColor);
-
+		Rect bounds = new Rect();
+		textPaint.getTextBounds(text, 0, text.length(), bounds);
+		// canvas.drawCircle(mColorWheelRectangle.centerX(),
+		// mColorWheelRectangle.centerY(), (bounds.width() / 2) + 5,
+		// mCircleTextColor);
 		canvas.drawText(text,
 				(mColorWheelRectangle.centerX())
 						- (textPaint.measureText(text) / 2),
-				mColorWheelRectangle.centerY() + (textPaint.getTextSize() / 2),
-				textPaint);
+				mColorWheelRectangle.centerY() + bounds.height() / 2, textPaint);
 
 		// last_radians = calculateRadiansFromAngle(mAngle);
 
@@ -350,6 +373,10 @@ public class HoloCircleSeekBar extends View {
 
 		mColorWheelRectangle.set(-mColorWheelRadius, -mColorWheelRadius,
 				mColorWheelRadius, mColorWheelRadius);
+
+		mColorCenterHaloRectangle.set(-mColorWheelRadius / 2,
+				-mColorWheelRadius / 2, mColorWheelRadius / 2,
+				mColorWheelRadius / 2);
 
 		pointerPosition = calculatePointerPosition(mAngle);
 
@@ -699,8 +726,9 @@ public class HoloCircleSeekBar extends View {
 					pointerPosition = calculatePointerPosition(mAngle);
 				}
 				invalidate();
-				mOnCircleSeekBarChangeListener.onProgressChanged(this,
-						Integer.parseInt(text), true);
+				if (mOnCircleSeekBarChangeListener != null)
+					mOnCircleSeekBarChangeListener.onProgressChanged(this,
+							Integer.parseInt(text), true);
 
 				last_radians = radians;
 
