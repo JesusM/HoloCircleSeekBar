@@ -253,6 +253,9 @@ public class HoloCircleSeekBar extends View {
 
 		last_radians = end_wheel;
 
+		if (init_position < start_arc)
+			init_position = calculateTextFromStartAngle(start_arc);
+
 		// mAngle = (float) calculateAngleFromText(init_position);
 
 		if (color_attr != null) {
@@ -394,6 +397,14 @@ public class HoloCircleSeekBar extends View {
 
 		return (int) (max / f);
 	}
+	
+	private int calculateTextFromStartAngle(float angle) {
+		float m = angle;
+
+		float f = (float) ((end_wheel - start_arc) / m);
+
+		return (int) (max / f);
+	}
 
 	private double calculateAngleFromText(int position) {
 		if (position == 0 || position >= max)
@@ -408,6 +419,8 @@ public class HoloCircleSeekBar extends View {
 		return ang;
 
 	}
+	
+
 
 	private int calculateRadiansFromAngle(float angle) {
 		float unit = (float) (angle / (2 * Math.PI));
