@@ -5,6 +5,8 @@
         <attr name="wheel_size" format="integer" />
         <attr name="pointer_size" format="integer" />
         <attr name="max" format="integer"></attr>
+        <attr name="start_angle" format="integer"></attr>
+        <attr name="end_angle" format="integer"></attr>
         <attr name="text_size" format="integer"></attr>
         <attr name="init_position" format="integer"></attr>
         <attr name="color" format="string"></attr>
