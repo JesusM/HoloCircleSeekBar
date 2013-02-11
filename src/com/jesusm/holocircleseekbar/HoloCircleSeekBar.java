@@ -149,6 +149,8 @@ public class HoloCircleSeekBar extends View {
 	private Paint mCircleTextColor;
 	private int end_wheel;
 
+	private boolean show_text = true;
+
 	public HoloCircleSeekBar(Context context) {
 		super(context);
 		init(null, 0);
@@ -250,6 +252,8 @@ public class HoloCircleSeekBar extends View {
 
 		start_arc = a.getInteger(R.styleable.HoloCircleSeekBar_start_angle, 0);
 		end_wheel = a.getInteger(R.styleable.HoloCircleSeekBar_end_angle, 360);
+
+		show_text = a.getBoolean(R.styleable.HoloCircleSeekBar_show_text, true);
 
 		last_radians = end_wheel;
 
@@ -359,10 +363,13 @@ public class HoloCircleSeekBar extends View {
 		// canvas.drawCircle(mColorWheelRectangle.centerX(),
 		// mColorWheelRectangle.centerY(), (bounds.width() / 2) + 5,
 		// mCircleTextColor);
-		canvas.drawText(text,
-				(mColorWheelRectangle.centerX())
-						- (textPaint.measureText(text) / 2),
-				mColorWheelRectangle.centerY() + bounds.height() / 2, textPaint);
+		if (show_text)
+			canvas.drawText(
+					text,
+					(mColorWheelRectangle.centerX())
+							- (textPaint.measureText(text) / 2),
+					mColorWheelRectangle.centerY() + bounds.height() / 2,
+					textPaint);
 
 		// last_radians = calculateRadiansFromAngle(mAngle);
 
@@ -397,7 +404,7 @@ public class HoloCircleSeekBar extends View {
 
 		return (int) (max / f);
 	}
-	
+
 	private int calculateTextFromStartAngle(float angle) {
 		float m = angle;
 
@@ -419,8 +426,6 @@ public class HoloCircleSeekBar extends View {
 		return ang;
 
 	}
-	
-
 
 	private int calculateRadiansFromAngle(float angle) {
 		float unit = (float) (angle / (2 * Math.PI));
