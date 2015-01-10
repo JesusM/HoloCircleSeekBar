@@ -10,7 +10,6 @@
         <attr name="end_angle" format="integer"></attr>
         <attr name="text_size" format="integer"></attr>
         <attr name="init_position" format="integer"></attr>
-        <attr name="color" format="string"></attr>
         <attr name="wheel_active_color" format="string"></attr>
         <attr name="wheel_unactive_color" format="string"></attr>
         <attr name="pointer_color" format="string"></attr>
