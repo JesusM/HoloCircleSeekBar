@@ -29,16 +29,12 @@ import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * Displays a holo-themed color picker.
- * 
- * <p>
- * Use {@link #getColor()} to retrieve the selected color.
- * </p>
+ * Displays a holo-themed circular seek bar.
+ *
  */
 public class HoloCircleSeekBar extends View {
 	/*
@@ -127,8 +123,6 @@ public class HoloCircleSeekBar extends View {
 	private String text;
 	private int conversion = 0;
 	private int max = 100;
-	private String color_attr;
-	private int color;
 	private SweepGradient s;
 	private Paint mArcColor;
 	private String wheel_color_attr, wheel_unactive_color_attr,
@@ -233,7 +227,6 @@ public class HoloCircleSeekBar extends View {
 				R.styleable.HoloCircleSeekBar_pointer_size, 48);
 		max = a.getInteger(R.styleable.HoloCircleSeekBar_max, 100);
 
-		color_attr = a.getString(R.styleable.HoloCircleSeekBar_color);
 		wheel_color_attr = a
 				.getString(R.styleable.HoloCircleSeekBar_wheel_active_color);
 		wheel_unactive_color_attr = a
@@ -261,17 +254,6 @@ public class HoloCircleSeekBar extends View {
 			init_position = calculateTextFromStartAngle(start_arc);
 
 		// mAngle = (float) calculateAngleFromText(init_position);
-
-		if (color_attr != null) {
-			try {
-				color = Color.parseColor(color_attr);
-			} catch (IllegalArgumentException e) {
-				color = Color.CYAN;
-			}
-			color = Color.parseColor(color_attr);
-		} else {
-			color = Color.CYAN;
-		}
 
 		if (wheel_color_attr != null) {
 			try {
@@ -608,7 +590,7 @@ public class HoloCircleSeekBar extends View {
 	public interface OnCircleSeekBarChangeListener {
 
 		public abstract void onProgressChanged(HoloCircleSeekBar seekBar,
-				int progress, boolean fromUser);
+                                               int progress, boolean fromUser);
 
 	}
 
