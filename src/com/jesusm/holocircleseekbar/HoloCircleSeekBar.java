@@ -128,7 +128,8 @@ public class HoloCircleSeekBar extends View {
 	private String wheel_color_attr, wheel_unactive_color_attr,
 			pointer_color_attr, pointer_halo_color_attr, text_color_attr;
 	private int wheel_color, unactive_wheel_color, pointer_color,
-			pointer_halo_color, text_size, text_color, init_position;
+			pointer_halo_color, text_size, text_color;
+	private int init_position = -1;
 	private boolean block_end = false;
 	private float lastX;
 	private int last_radians = 0;
@@ -430,7 +431,8 @@ public class HoloCircleSeekBar extends View {
 	 * @return the value between 0 and max
 	 */
 	public int getValue() {
-		return conversion;
+		return Integer.valueOf(text);
+		// return conversion;
 	}
 
 	@Override
@@ -583,6 +585,15 @@ public class HoloCircleSeekBar extends View {
 		// mPointerColor.setColor(pointer_color);
 	}
 
+	public void setInitPosition(int init) {
+		init_position = init;
+		text = String.valueOf(init_position);
+		mAngle = calculateAngleFromRadians(init_position);
+		arc_finish_radians = calculateRadiansFromAngle(mAngle);
+		pointerPosition = calculatePointerPosition(mAngle);
+		invalidate();
+	}
+
 	public void setOnSeekBarChangeListener(OnCircleSeekBarChangeListener l) {
 		mOnCircleSeekBarChangeListener = l;
 	}
@@ -590,7 +601,7 @@ public class HoloCircleSeekBar extends View {
 	public interface OnCircleSeekBarChangeListener {
 
 		public abstract void onProgressChanged(HoloCircleSeekBar seekBar,
-                                               int progress, boolean fromUser);
+				int progress, boolean fromUser);
 
 	}
 
