@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="point_color">#00BCD4</color>
+    <color name="text_color">#D50000</color>
+    <color name="point_halo_color">#607D8B</color>
+    <color name="wheel_unactive_color">#BDBDBD</color>
+    <color name="wheel_active_color">#4CAF50</color>
+</resources>

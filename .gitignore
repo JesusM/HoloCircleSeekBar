@@ -1,24 +1,31 @@
-#Android generated
-bin
-gen
+# Built application files
+build/
+gen/
 
-#Eclipse
-.project
-.classpath
-.settings
-
-#IntelliJ IDEA
-.idea
-*.iml
-classes
-
-#Command line
-build.xml
-proguard-project.txt
-
-#Mac specific
-.DS_Store
-
-#User specific
+# Local configuration file (sdk path, etc)
 local.properties
-sample/src/com/cyrilmottier/android/polarissample/util/LocalConfig.java
+
+# Gradle generated files
+.gradle/
+
+# User-specific configurations
+.idea/libraries/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/.name
+.idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/gradle.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+*.iml
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

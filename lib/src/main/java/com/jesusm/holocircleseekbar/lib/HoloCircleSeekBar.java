@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.jesusm.holocircleseekbar;
+package com.jesusm.holocircleseekbar.lib;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -32,16 +32,25 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.example.jesus.lib.R;
+
 /**
  * Displays a holo-themed circular seek bar.
  *
  */
 public class HoloCircleSeekBar extends View {
+
 	/*
-	 * Constants used to save/restore the instance state.
-	 */
+        * Constants used to save/restore the instance state.
+        */
 	private static final String STATE_PARENT = "parent";
 	private static final String STATE_ANGLE = "angle";
+	private static final int TEXT_SIZE_DEFAULT_VALUE = 25;
+	private static final int END_WHEEL_DEFAULT_VALUE = 360;
+	public static final int COLOR_WHEEL_STROKE_WIDTH_DEF_VALUE = 16;
+	public static final float POINTER_RADIUS_DEF_VALUE = 8;
+	public static final int MAX_POINT_DEF_VALUE = 100;
+	public static final int START_ANGLE_DEF_VALUE = 0;
 
 	private OnCircleSeekBarChangeListener mOnCircleSeekBarChangeListener;
 
@@ -68,7 +77,7 @@ public class HoloCircleSeekBar extends View {
 	/**
 	 * The radius of the pointer (in pixels).
 	 */
-	private int mPointerRadius;
+	private float mPointerRadius;
 
 	/**
 	 * The rectangle enclosing the color wheel.
@@ -82,11 +91,6 @@ public class HoloCircleSeekBar extends View {
 	 * @see #onTouchEvent(MotionEvent)
 	 */
 	private boolean mUserIsMovingPointer = false;
-
-	/**
-	 * The ARGB value of the currently selected color.
-	 */
-	private int mColor;
 
 	/**
 	 * Number of pixels the origin of this view is moved in X- and Y-direction.
@@ -121,14 +125,10 @@ public class HoloCircleSeekBar extends View {
 	private float mAngle;
 	private Paint textPaint;
 	private String text;
-	private int conversion = 0;
 	private int max = 100;
 	private SweepGradient s;
 	private Paint mArcColor;
-	private String wheel_color_attr, wheel_unactive_color_attr,
-			pointer_color_attr, pointer_halo_color_attr, text_color_attr;
-	private int wheel_color, unactive_wheel_color, pointer_color,
-			pointer_halo_color, text_size, text_color;
+	private int wheel_color, unactive_wheel_color, pointer_color, pointer_halo_color, text_size, text_color;
 	private int init_position = -1;
 	private boolean block_end = false;
 	private float lastX;
@@ -139,12 +139,11 @@ public class HoloCircleSeekBar extends View {
 	private int start_arc = 270;
 
 	private float[] pointerPosition;
-	private Paint mColorCenterHalo;
 	private RectF mColorCenterHaloRectangle = new RectF();
-	private Paint mCircleTextColor;
 	private int end_wheel;
 
 	private boolean show_text = true;
+	private Rect bounds = new Rect();
 
 	public HoloCircleSeekBar(Context context) {
 		super(context);
@@ -173,10 +172,10 @@ public class HoloCircleSeekBar extends View {
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorWheelPaint.setShader(s);
 		mColorWheelPaint.setColor(unactive_wheel_color);
-		mColorWheelPaint.setStyle(Paint.Style.STROKE);
+		mColorWheelPaint.setStyle(Style.STROKE);
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
-		mColorCenterHalo = new Paint(Paint.ANTI_ALIAS_FLAG);
+		Paint mColorCenterHalo = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mColorCenterHalo.setColor(Color.CYAN);
 		mColorCenterHalo.setAlpha(0xCC);
 		// mColorCenterHalo.setStyle(Paint.Style.STROKE);
@@ -203,12 +202,12 @@ public class HoloCircleSeekBar extends View {
 
 		mArcColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mArcColor.setColor(wheel_color);
-		mArcColor.setStyle(Paint.Style.STROKE);
+		mArcColor.setStyle(Style.STROKE);
 		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
 
-		mCircleTextColor = new Paint(Paint.ANTI_ALIAS_FLAG);
+		Paint mCircleTextColor = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mCircleTextColor.setColor(Color.WHITE);
-		mCircleTextColor.setStyle(Paint.Style.FILL);
+		mCircleTextColor.setStyle(Style.FILL);
 
 		arc_finish_radians = (int) calculateAngleFromText(init_position) - 90;
 
@@ -223,29 +222,28 @@ public class HoloCircleSeekBar extends View {
 
 	private void initAttributes(TypedArray a) {
 		mColorWheelStrokeWidth = a.getInteger(
-				R.styleable.HoloCircleSeekBar_wheel_size, 16);
-		mPointerRadius = a.getInteger(
-				R.styleable.HoloCircleSeekBar_pointer_size, 48);
-		max = a.getInteger(R.styleable.HoloCircleSeekBar_max, 100);
+				R.styleable.HoloCircleSeekBar_wheel_size, COLOR_WHEEL_STROKE_WIDTH_DEF_VALUE);
+		mPointerRadius = a.getDimension(
+				R.styleable.HoloCircleSeekBar_pointer_size, POINTER_RADIUS_DEF_VALUE);
+		max = a.getInteger(R.styleable.HoloCircleSeekBar_max, MAX_POINT_DEF_VALUE);
 
-		wheel_color_attr = a
+		String wheel_color_attr = a
 				.getString(R.styleable.HoloCircleSeekBar_wheel_active_color);
-		wheel_unactive_color_attr = a
+		String wheel_unactive_color_attr = a
 				.getString(R.styleable.HoloCircleSeekBar_wheel_unactive_color);
-		pointer_color_attr = a
+		String pointer_color_attr = a
 				.getString(R.styleable.HoloCircleSeekBar_pointer_color);
-		pointer_halo_color_attr = a
+		String pointer_halo_color_attr = a
 				.getString(R.styleable.HoloCircleSeekBar_pointer_halo_color);
 
-		text_color_attr = a.getString(R.styleable.HoloCircleSeekBar_text_color);
+		String text_color_attr = a.getString(R.styleable.HoloCircleSeekBar_text_color);
 
-		text_size = a.getInteger(R.styleable.HoloCircleSeekBar_text_size, 95);
+		text_size = a.getDimensionPixelSize(R.styleable.HoloCircleSeekBar_text_size, TEXT_SIZE_DEFAULT_VALUE);
 
-		init_position = a.getInteger(
-				R.styleable.HoloCircleSeekBar_init_position, 0);
+		init_position = a.getInteger(R.styleable.HoloCircleSeekBar_init_position, 0);
 
-		start_arc = a.getInteger(R.styleable.HoloCircleSeekBar_start_angle, 0);
-		end_wheel = a.getInteger(R.styleable.HoloCircleSeekBar_end_angle, 360);
+		start_arc = a.getInteger(R.styleable.HoloCircleSeekBar_start_angle, START_ANGLE_DEF_VALUE);
+		end_wheel = a.getInteger(R.styleable.HoloCircleSeekBar_end_angle, END_WHEEL_DEFAULT_VALUE);
 
 		show_text = a.getBoolean(R.styleable.HoloCircleSeekBar_show_text, true);
 
@@ -341,7 +339,6 @@ public class HoloCircleSeekBar extends View {
 
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
 				(float) (mPointerRadius / 1.2), mPointerColor);
-		Rect bounds = new Rect();
 		textPaint.getTextBounds(text, 0, text.length(), bounds);
 		// canvas.drawCircle(mColorWheelRectangle.centerX(),
 		// mColorWheelRectangle.centerY(), (bounds.width() / 2) + 5,
@@ -383,7 +380,7 @@ public class HoloCircleSeekBar extends View {
 	private int calculateTextFromAngle(float angle) {
 		float m = angle - start_arc;
 
-		float f = (float) ((end_wheel - start_arc) / m);
+		float f = (end_wheel - start_arc) / m;
 
 		return (int) (max / f);
 	}
@@ -404,10 +401,7 @@ public class HoloCircleSeekBar extends View {
 
 		double f_r = 360 / f;
 
-		double ang = f_r + 90;
-
-		return ang;
-
+		return f_r + 90;
 	}
 
 	private int calculateRadiansFromAngle(float angle) {
@@ -444,7 +438,7 @@ public class HoloCircleSeekBar extends View {
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			// Check whether the user pressed on (or near) the pointer
-			mAngle = (float) java.lang.Math.atan2(y, x);
+			mAngle = (float) Math.atan2(y, x);
 
 			block_end = false;
 			block_start = false;
@@ -457,16 +451,15 @@ public class HoloCircleSeekBar extends View {
 				block_end = true;
 			}
 
-			if (!block_end && !block_start) {
-				text = String
-						.valueOf(calculateTextFromAngle(arc_finish_radians));
+			if (!block_end) {
+				text = String.valueOf(calculateTextFromAngle(arc_finish_radians));
 				pointerPosition = calculatePointerPosition(mAngle);
 				invalidate();
 			}
 			break;
 		case MotionEvent.ACTION_MOVE:
 			if (mUserIsMovingPointer) {
-				mAngle = (float) java.lang.Math.atan2(y, x);
+				mAngle = (float) Math.atan2(y, x);
 
 				int radians = calculateRadiansFromAngle(mAngle);
 
@@ -581,8 +574,6 @@ public class HoloCircleSeekBar extends View {
 		arc_finish_radians = calculateRadiansFromAngle(mAngle);
 		text = String.valueOf(calculateTextFromAngle(arc_finish_radians));
 		pointerPosition = calculatePointerPosition(mAngle);
-
-		// mPointerColor.setColor(pointer_color);
 	}
 
 	public void setInitPosition(int init) {
@@ -601,7 +592,7 @@ public class HoloCircleSeekBar extends View {
 	public interface OnCircleSeekBarChangeListener {
 
 		public abstract void onProgressChanged(HoloCircleSeekBar seekBar,
-				int progress, boolean fromUser);
+											   int progress, boolean fromUser);
 
 	}
 

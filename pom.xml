@@ -54,7 +54,7 @@
             <artifactId>support-v4</artifactId>
             <version>${android-support.version}</version>
             <scope>system</scope>
-            <systemPath>${basedir}/libs/android-support-v4.jar</systemPath>
+            <systemPath>HoloCircleSeekBar/libs/android-support-v4.jar</systemPath>
         </dependency>
     </dependencies>
     <build>
@@ -126,6 +126,6 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <sourceDirectory>src</sourceDirectory>
+        <sourceDirectory>app/src</sourceDirectory>
     </build>
 </project>

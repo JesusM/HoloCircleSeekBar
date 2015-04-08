@@ -1,0 +1,26 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".SampleActivityFragment"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.jesusm.holocircleseekbar.lib.HoloCircleSeekBar
+        android:layout_centerInParent="true"
+        android:id="@+id/picker"
+        android:layout_width="285dp"
+        android:layout_height="290dp"
+        app:max="100"
+        app:pointer_color="@color/point_color"
+        app:pointer_halo_color="@color/point_halo_color"
+        app:pointer_size="20dp"
+        app:text_color="@color/text_color"
+        app:text_size="65sp"
+        app:wheel_active_color="@color/wheel_active_color"
+        app:wheel_unactive_color="@color/wheel_unactive_color"/>
+
+</RelativeLayout>

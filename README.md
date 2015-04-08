@@ -10,7 +10,7 @@ A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz 
 <h2>Documentation</h2>
 Add this to your xml
 
-	<com.jesusm.holocircleseekbar.HoloCircleSeekBar
+	<main.java.com.jesusm.holocircleseekbar.HoloCircleSeekBar
         android:id="@+id/picker"
                 android:layout_width="285dp"
         android:layout_height="290dp"/>
