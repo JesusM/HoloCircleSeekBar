@@ -2,38 +2,46 @@
 
 A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz and developed by Lars Werkman.
 
-![image](https://lh3.googleusercontent.com/-EuIwYqaMhB4/URouyGV0_pI/AAAAAAAAA3s/Fboe1ob5xYg/s512/photo.jpg)
-![image](https://lh4.googleusercontent.com/-nNIvt3_fjgE/UP8tiKd-7qI/AAAAAAAAAuY/esuQXaicKsg/s514/scree.png)
+![image](/images/device-2015-04-08-225534.png)
+![image](/images/device-2015-04-08-225733.png)
 
 
 
 <h2>Documentation</h2>
-Add this to your xml
+To add the widget, you only need to add this to your xml:
 
-	<main.java.com.jesusm.holocircleseekbar.HoloCircleSeekBar
+    <com.jesusm.holocircleseekbar.lib.HoloCircleSeekBar
+        android:layout_centerInParent="true"
         android:id="@+id/picker"
-                android:layout_width="285dp"
-        android:layout_height="290dp"/>
+        android:layout_width="285dp"
+        android:layout_height="290dp"
+        app:max="100"
+        app:pointer_color="@color/point_color"
+        app:pointer_halo_color="@color/point_halo_color"
+        app:pointer_size="20dp"
+        app:text_color="@color/text_color"
+        app:text_size="65sp"
+        app:wheel_active_color="@color/wheel_active_color"
+        app:wheel_unactive_color="@color/wheel_unactive_color"/>
 
-Don't forget to add this at the root of your View in the xml layout when you use HoloCircleSeekBar:
+Don't forget to add this at the root of your View in the xml layout to use the custom attributes:
 
 	xmlns:app="http://schemas.android.com/apk/res-auto"
         
 You can change some widget components (text size, wheel color, point color, etc) sith this attrs.
  
- 	 app:max="100"
-     app:pointer_color="#0174DF"
-     app:pointer_halo_color="#88252525"
-     app:pointer_size="34"
-     app:text_color="#FF0000"
-     app:text_size="65"
-     app:wheel_active_color="#00BFFF"
-     app:wheel_unactive_color="#FFCCCCCC" 
+        app:max="100"
+        app:pointer_color="#0174DF"
+        app:pointer_halo_color="#88252525"
+        app:pointer_size="34"
+        app:text_color="#FF0000"
+        app:text_size="65"
+        app:wheel_active_color="#00BFFF"
+        app:wheel_unactive_color="#FFCCCCCC" 
 
 To get the value of the circle seekbar
 
 	HoloSeekBar picker = (HoloSeekBar) findViewById(R.id.picker);
-	
 	picker.getValue();
 	
 <H2>License</H2>
