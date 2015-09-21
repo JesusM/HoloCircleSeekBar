@@ -3,7 +3,7 @@
 A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz and developed by Lars Werkman.
 
 ![image](/images/device-2015-04-08-225534.png)
-![image](/images/device-2015-04-08-225733.png)
+![image](/images/device-2015-09-21-225940.png)
 
 
 
