@@ -48,6 +48,16 @@ public class SampleActivityFragment extends Fragment {
         });
         seekBar.setOnSeekBarChangeListener(new HoloCircleSeekBar.OnCircleSeekBarChangeListener() {
             @Override
+            public void onStartTrackingTouch(HoloCircleSeekBar seekBar) {
+                // Nothing to do
+            }
+
+            @Override
+            public void onStopTrackingTouch(HoloCircleSeekBar seekBar) {
+                // Nothing to do
+            }
+
+            @Override
             public void onProgressChanged(HoloCircleSeekBar seekBar, int progress, boolean fromUser) {
                 value.setText(String.valueOf(progress));
             }

@@ -478,6 +478,9 @@ public class HoloCircleSeekBar extends View {
 				updatePointerPosition();
 				invalidate();
 			}
+            if (mOnCircleSeekBarChangeListener != null) {
+                mOnCircleSeekBarChangeListener.onStartTrackingTouch(this);
+            }
 			break;
 		case MotionEvent.ACTION_MOVE:
 			if (mUserIsMovingPointer) {
@@ -540,6 +543,9 @@ public class HoloCircleSeekBar extends View {
 			break;
 		case MotionEvent.ACTION_UP:
 			mUserIsMovingPointer = false;
+            if (mOnCircleSeekBarChangeListener != null) {
+                mOnCircleSeekBarChangeListener.onStopTrackingTouch(this);
+            }
 			break;
 		}
 		// Fix scrolling
@@ -613,8 +619,11 @@ public class HoloCircleSeekBar extends View {
 
 	public interface OnCircleSeekBarChangeListener {
 
-		public abstract void onProgressChanged(HoloCircleSeekBar seekBar,
-											   int progress, boolean fromUser);
+        void onProgressChanged(HoloCircleSeekBar seekBar, int progress, boolean fromUser);
+
+        void onStartTrackingTouch(HoloCircleSeekBar seekBar);
+
+        void onStopTrackingTouch(HoloCircleSeekBar seekBar);
 
 	}
 
