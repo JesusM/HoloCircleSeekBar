@@ -5,6 +5,21 @@ A Circle SeekBar inspired by Android Holo ColorPicker designed by Marie Schweiz 
 ![image](/images/device-2015-04-08-225534.png)
 ![image](/images/device-2015-09-21-225940.png)
 
+<h2>How to integrate in your proyect</h2>
+
+Import it on your **build.gradle**
+
+```
+repositories {
+    maven {
+	    url "https://jitpack.io"
+    }
+}
+
+dependencies {
+    compile 'com.github.JesusM:HoloCircleSeekBar:v2.2.2'
+}
+```
 
 
 <h2>Documentation</h2>
