@@ -3,13 +3,20 @@ package com.jesusm.holocircleseekbar.app;
 import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 
 import com.jesusm.holocircleseekbar.lib.HoloCircleSeekBar;
 
 public class SampleActivityFragment extends Fragment {
+
+    private HoloCircleSeekBar seekBar;
+    private EditText maxValue;
+    private EditText value;
 
     public SampleActivityFragment() {
     }
@@ -18,29 +25,53 @@ public class SampleActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_sample, container, false);
-        HoloCircleSeekBar seekBar = (HoloCircleSeekBar) rootView.findViewById(R.id.picker);
+        seekBar = (HoloCircleSeekBar) rootView.findViewById(R.id.picker);
+        maxValue = (EditText) rootView.findViewById(R.id.change_max_value);
+        maxValue.setText(String.valueOf(seekBar.getMaxValue()));
+        value = (EditText) rootView.findViewById(R.id.change_value);
+        value.setText(String.valueOf(seekBar.getValue()));
+        rootView.findViewById(R.id.change_max_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newValue = maxValue.getText().toString();
+                if (!TextUtils.isEmpty(newValue)) {
+                    seekBar.setMax(Integer.valueOf(newValue));
+                }
+            }
+        });
+        rootView.findViewById(R.id.change_value_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String newValue = value.getText().toString();
+                if (!TextUtils.isEmpty(newValue)) {
+                    seekBar.setValue(Integer.valueOf(newValue));
+                }
+            }
+        });
         seekBar.setOnSeekBarChangeListener(new HoloCircleSeekBar.OnCircleSeekBarChangeListener() {
             @Override
-            public void onProgressChanged(HoloCircleSeekBar seekBar, int progress, boolean fromUser) {
-                if (progress > 50) {
-                    seekBar.setNegativeColor(Color.DKGRAY);
-                    seekBar.setPointerWheelColor(Color.BLUE);
-                }
-
-            }
-
-            @Override
             public void onStartTrackingTouch(HoloCircleSeekBar seekBar) {
-
+                // Nothing to do
             }
 
             @Override
             public void onStopTrackingTouch(HoloCircleSeekBar seekBar) {
+                // Nothing to do
+            }
 
+            @Override
+            public void onProgressChanged(HoloCircleSeekBar seekBar, int progress, boolean fromUser) {
+                value.setText(String.valueOf(progress));
+                if (progress > 50) {
+                    Log.i(SampleActivityFragment.class.getSimpleName()
+                            , "Color change");
+                    seekBar.setActiveColor(Color.RED);
+                    seekBar.setUnActiveColor(Color.DKGRAY);
+                    seekBar.setPointerWheelColor(Color.BLUE);
+                    seekBar.setTextColor(Color.GREEN);
+                }
             }
         });
-
-        seekBar.setNegativeColor(Color.WHITE);
         return rootView;
     }
 }

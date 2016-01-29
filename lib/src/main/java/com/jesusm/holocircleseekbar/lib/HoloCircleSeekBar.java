@@ -435,18 +435,18 @@ public class HoloCircleSeekBar extends View {
     }
 
     /**
-     * Change the positive color of the seekbar (i.e color painted after a positive change)
+     * Change the active state color of the seekbar
      * @param newColor color to be changed to in int
      */
-    public void setPositiveColor(int newColor){
+    public void setActiveColor(int newColor){
         mArcPaint.setColor(newColor);
     }
 
     /**
-     * Change the negative color of the seekbar (i.e the stroke of the seekbar circle)
+     * Change the un active state color of the seekbar
      * @param newColor color to be changed to in int
      */
-    public void setNegativeColor(int newColor) {
+    public void setUnActiveColor(int newColor) {
         mColorWheelPaint.setColor(newColor);
     }
 
