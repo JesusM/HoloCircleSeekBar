@@ -25,7 +25,6 @@ import android.graphics.Paint.Align;
 import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.SweepGradient;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -122,12 +121,13 @@ public class HoloCircleSeekBar extends View {
 	/**
 	 * The pointer's position expressed as angle (in rad).
 	 */
-	private float mAngle;
+    private Paint mArcPaint;
+
+
+    private float mAngle;
 	private Paint textPaint;
 	private String text;
 	private int max = 100;
-	private SweepGradient s;
-	private Paint mArcColor;
 	private int wheel_color, unactive_wheel_color, pointer_color, pointer_halo_color, text_size, text_color;
 	private int init_position = -1;
 	private boolean block_end = false;
@@ -170,17 +170,9 @@ public class HoloCircleSeekBar extends View {
 		// mAngle = (float) (-Math.PI / 2);
 
 		mColorWheelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mColorWheelPaint.setShader(s);
 		mColorWheelPaint.setColor(unactive_wheel_color);
 		mColorWheelPaint.setStyle(Style.STROKE);
 		mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
-
-		Paint mColorCenterHalo = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mColorCenterHalo.setColor(Color.CYAN);
-		mColorCenterHalo.setAlpha(0xCC);
-		// mColorCenterHalo.setStyle(Paint.Style.STROKE);
-		// mColorCenterHalo.setStrokeWidth(mColorCenterHaloRectangle.width() /
-		// 2);
 
 		mPointerHaloPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPointerHaloPaint.setColor(pointer_halo_color);
@@ -200,14 +192,10 @@ public class HoloCircleSeekBar extends View {
 		// mPointerColor.setColor(calculateColor(mAngle));
 		mPointerColor.setColor(pointer_color);
 
-		mArcColor = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mArcColor.setColor(wheel_color);
-		mArcColor.setStyle(Style.STROKE);
-		mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
-
-		Paint mCircleTextColor = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mCircleTextColor.setColor(Color.WHITE);
-		mCircleTextColor.setStyle(Style.FILL);
+		mArcPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		mArcPaint.setColor(wheel_color);
+		mArcPaint.setStyle(Style.STROKE);
+		mArcPaint.setStrokeWidth(mColorWheelStrokeWidth);
 
 		arc_finish_radians = (int) calculateAngleFromText(init_position) - 90;
 
@@ -328,7 +316,7 @@ public class HoloCircleSeekBar extends View {
 
 		canvas.drawArc(mColorWheelRectangle, start_arc + 270,
 				(arc_finish_radians) > (end_wheel) ? end_wheel - (start_arc)
-						: arc_finish_radians - start_arc, false, mArcColor);
+						: arc_finish_radians - start_arc, false, mArcPaint);
 
 		// Draw the pointer's "halo"
 		canvas.drawCircle(pointerPosition[0], pointerPosition[1],
@@ -369,8 +357,8 @@ public class HoloCircleSeekBar extends View {
 				mColorWheelRadius, mColorWheelRadius);
 
 		mColorCenterHaloRectangle.set(-mColorWheelRadius / 2,
-				-mColorWheelRadius / 2, mColorWheelRadius / 2,
-				mColorWheelRadius / 2);
+                -mColorWheelRadius / 2, mColorWheelRadius / 2,
+                mColorWheelRadius / 2);
 
 		updatePointerPosition();
 
@@ -385,9 +373,8 @@ public class HoloCircleSeekBar extends View {
 	}
 
 	private int calculateTextFromStartAngle(float angle) {
-		float m = angle;
 
-		float f = (float) ((end_wheel - start_arc) / m);
+        float f = (end_wheel - start_arc) / angle;
 
 		return (int) (max / f);
 	}
@@ -445,6 +432,46 @@ public class HoloCircleSeekBar extends View {
 			updatePointerPosition();
 			invalidate();
         }
+    }
+
+    /**
+     * Change the positive color of the seekbar (i.e color painted after a positive change)
+     * @param newColor color to be changed to in int
+     */
+    public void setPositiveColor(int newColor){
+        mArcPaint.setColor(newColor);
+    }
+
+    /**
+     * Change the negative color of the seekbar (i.e the stroke of the seekbar circle)
+     * @param newColor color to be changed to in int
+     */
+    public void setNegativeColor(int newColor) {
+        mColorWheelPaint.setColor(newColor);
+    }
+
+    /**
+     * Change the stroke color of the pointer
+     * @param newColor color to be changed to in int
+     */
+    public void setPointerStrokeColor(int newColor){
+        mPointerHaloPaint.setColor(newColor);
+    }
+
+    /**
+     * Change the background color of the pointer
+     * @param newColor color to be changed to in int
+     */
+    public void setPointerWheelColor(int newColor){
+        mPointerColor.setColor(newColor);
+    }
+
+    /**
+     * Change the center text color
+     * @param newColor color to be changed to in int
+     */
+    public void setTextColor(int newColor){
+        textPaint.setColor(newColor);
     }
 
 	private void updatePointerPosition() {
@@ -626,5 +653,4 @@ public class HoloCircleSeekBar extends View {
         void onStopTrackingTouch(HoloCircleSeekBar seekBar);
 
 	}
-
 }
