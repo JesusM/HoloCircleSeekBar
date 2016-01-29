@@ -1,8 +1,10 @@
 package com.jesusm.holocircleseekbar.app;
 
 import android.app.Fragment;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,7 @@ public class SampleActivityFragment extends Fragment {
     private HoloCircleSeekBar seekBar;
     private EditText maxValue;
     private EditText value;
+    private boolean colorChanged ;
 
     public SampleActivityFragment() {
     }
@@ -60,6 +63,15 @@ public class SampleActivityFragment extends Fragment {
             @Override
             public void onProgressChanged(HoloCircleSeekBar seekBar, int progress, boolean fromUser) {
                 value.setText(String.valueOf(progress));
+                if (progress > 50 && !colorChanged) {
+                    Log.i(SampleActivityFragment.class.getSimpleName()
+                            , "Color change");
+                    colorChanged = true;
+                    seekBar.setActiveColor(Color.RED);
+                    seekBar.setUnActiveColor(Color.DKGRAY);
+                    seekBar.setPointerWheelColor(Color.BLUE);
+                    seekBar.setTextColor(Color.GREEN);
+                }
             }
         });
         return rootView;
