@@ -54,6 +54,16 @@ You can change some widget components (text size, wheel color, point color, etc)
         app:wheel_active_color="#00BFFF"
         app:wheel_unactive_color="#FFCCCCCC" 
 
+You can also change the colors programmatically, for example: 
+
+	HoloCircleSeekBar seekBar = (HoloCircleSeekBar) rootView.findViewById(R.id.holo_seek_bar);
+	
+		seekBar.setActiveColor(Color.parseColor("#00BFFF"));
+		seekBar.setUnActiveColor(Color.parseColor("#FFCCCCCC"));
+	  	seekBar.setPointerWheelColor(Color.parseColor("#0174DF"));
+	  	seekBar.setPointerStrokeColor(Color.parseColor("#88252525"));
+	  	seekBar.setTextColor(Color.parseColor("#FF0000"));
+	  	
 To get the value of the circle seekbar
 
 	HoloSeekBar picker = (HoloSeekBar) findViewById(R.id.picker);
