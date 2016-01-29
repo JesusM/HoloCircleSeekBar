@@ -17,6 +17,7 @@ public class SampleActivityFragment extends Fragment {
     private HoloCircleSeekBar seekBar;
     private EditText maxValue;
     private EditText value;
+    private boolean colorChanged ;
 
     public SampleActivityFragment() {
     }
@@ -62,9 +63,10 @@ public class SampleActivityFragment extends Fragment {
             @Override
             public void onProgressChanged(HoloCircleSeekBar seekBar, int progress, boolean fromUser) {
                 value.setText(String.valueOf(progress));
-                if (progress > 50) {
+                if (progress > 50 && !colorChanged) {
                     Log.i(SampleActivityFragment.class.getSimpleName()
                             , "Color change");
+                    colorChanged = true;
                     seekBar.setActiveColor(Color.RED);
                     seekBar.setUnActiveColor(Color.DKGRAY);
                     seekBar.setPointerWheelColor(Color.BLUE);
