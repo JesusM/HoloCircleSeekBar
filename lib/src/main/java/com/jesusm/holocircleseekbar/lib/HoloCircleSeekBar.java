@@ -435,14 +435,21 @@ public class HoloCircleSeekBar extends View {
 		updatePointerPosition();
 		invalidate();
 	}
-
+	
+	public int getNormedValue(int value){
+		float temp = value / max * 255;
+		
+		return (int)temp;
+		
+	}
+	
     public void setValue(float newValue) {
     	int _newVal = (int)(newValue);
     	if(_newVal == 0 ){
-    	    float newAngle = (float) (360.0 * (1 / max));
+    	    float newAngle = (float) (360.0 * (max / max));
             arc_finish_radians = (int)calculateAngleFromRadians(calculateRadiansFromAngle(newAngle)) ;
 	    mAngle = calculateAngleFromRadians(arc_finish_radians);
-	    setText(String.valueOf(0));
+	    setText(String.valueOf(getNormedValue(_newValue)));
 	    updatePointerPosition();
 	    invalidate();
     	}
