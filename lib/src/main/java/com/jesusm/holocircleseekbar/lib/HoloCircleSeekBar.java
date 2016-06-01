@@ -446,10 +446,10 @@ public class HoloCircleSeekBar extends View {
     	int _newVal = (int)(newValue); 
         if (_newVal <= max && _newVal>=0) {
              if(_newVal == 0){
-    	        arc_finish_radians=this.start_arc;
+    	        arc_finish_radians = start_arc;
              }
-    	     else if(_newVal ==this.max){
-            	arc_finish_radians=this.end_wheel ;
+    	     else if(_newVal == this.max){
+            	arc_finish_radians = end_wheel -1;
              }
              else {
                 float newAngle = (float) (360.0 * (newValue / this.max));
