@@ -221,7 +221,7 @@ public class HoloCircleSeekBar extends View {
 	}
 
 	private void setText(String text) {
-		this.text = getNormedValue(Integer.valueOf(text));
+		this.text =Integer.toString(getNormedValue(Integer.valueOf(text)));
 	}
 
 	private void initAttributes(TypedArray a) {
