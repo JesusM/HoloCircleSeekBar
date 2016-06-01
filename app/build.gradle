@@ -21,4 +21,7 @@ android {
 
 dependencies {
     compile project(':lib')
+    compile parent.ext.libraries.appcompat
+    compile parent.ext.libraries.supportv4
+    compile parent.ext.libraries.supportv13
 }
