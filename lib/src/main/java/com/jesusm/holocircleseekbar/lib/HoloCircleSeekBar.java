@@ -221,7 +221,7 @@ public class HoloCircleSeekBar extends View {
 	}
 
 	private void setText(String text) {
-		this.text = text;
+		this.text =Integer.toString(getNormedValue(Integer.valueOf(text)));
 	}
 
 	private void initAttributes(TypedArray a) {
@@ -435,15 +435,30 @@ public class HoloCircleSeekBar extends View {
 		updatePointerPosition();
 		invalidate();
 	}
-
+	
+	public int getNormedValue(int value){
+		float temp = ((float)value / max) * 255;
+		return (int)temp;
+		
+	}
+	
     public void setValue(float newValue) {
-        if (newValue < max) {
-            float newAngle = (float) (360.0 * (newValue / max));
-            arc_finish_radians = (int) calculateAngleFromRadians(calculateRadiansFromAngle(newAngle)) + 1;
-			mAngle = calculateAngleFromRadians(arc_finish_radians);
-			setText(String.valueOf(calculateTextFromAngle(arc_finish_radians)));
-			updatePointerPosition();
-			invalidate();
+    	int _newVal = (int)(newValue); 
+        if (_newVal <= max && _newVal>=0) {
+             if(_newVal == 0){
+    	        arc_finish_radians = start_arc;
+             }
+    	     else if(_newVal == this.max){
+            	arc_finish_radians = end_wheel -1;
+             }
+             else {
+                float newAngle = (float) (360.0 * (newValue / this.max));
+                arc_finish_radians = (int) calculateAngleFromRadians(calculateRadiansFromAngle(newAngle)) + 1;
+             }
+	     mAngle = calculateAngleFromRadians(arc_finish_radians);
+	     setText(String.valueOf(_newVal));
+	     updatePointerPosition();
+	     invalidate();
         }
     }
 
