@@ -1,21 +1,5 @@
-/*
- * Copyright 2012 Lars Werkman
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.jesusm.holocircleseekbar.lib;
-
+  
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -56,6 +40,7 @@ public class HoloCircleSeekBar extends View {
      * {@code Paint} instance used to draw the pointer's "halo".
      */
     private Paint mPointerHaloPaint;
+    private Paint mPointerHaloPaint2;
 
     /**
      * {@code Paint} instance used to draw the pointer (the selected color).
@@ -65,7 +50,7 @@ public class HoloCircleSeekBar extends View {
     /**
      * The stroke width used to paint the color wheel (in pixels).
      */
-    private int mColorWheelStrokeWidth;
+    private float mColorWheelStrokeWidth;
 
     /**
      * The radius of the pointer (in pixels).
@@ -123,6 +108,7 @@ public class HoloCircleSeekBar extends View {
     private Paint mArcColor;
     private int wheel_color, unactive_wheel_color, pointer_color, pointer_halo_color, text_size, text_color;
     private int init_position = -1;
+    private int glow_color = -1;
     private boolean block_end = false;
     private float lastX;
     private int last_radians = 0;
@@ -137,6 +123,8 @@ public class HoloCircleSeekBar extends View {
 
     private boolean show_text = true;
     private Rect bounds = new Rect();
+
+    private Paint mArcColor2;
 
     public HoloCircleSeekBar(Context context) {
         super(context);
@@ -167,6 +155,7 @@ public class HoloCircleSeekBar extends View {
         mColorWheelPaint.setColor(unactive_wheel_color);
         mColorWheelPaint.setStyle(Style.STROKE);
         mColorWheelPaint.setStrokeWidth(mColorWheelStrokeWidth);
+        mColorWheelPaint.setDither(true);
 
         Paint mColorCenterHalo = new Paint(Paint.ANTI_ALIAS_FLAG);
         mColorCenterHalo.setColor(Color.CYAN);
@@ -178,6 +167,13 @@ public class HoloCircleSeekBar extends View {
         mPointerHaloPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mPointerHaloPaint.setColor(pointer_halo_color);
         mPointerHaloPaint.setStrokeWidth(mPointerRadius + 10);
+        mPointerHaloPaint.setDither(true);
+        // mPointerHaloPaint.setAlpha(150);
+
+        mPointerHaloPaint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPointerHaloPaint2.setColor(glow_color);
+        mPointerHaloPaint2.setStrokeWidth(mPointerRadius + 10);
+        mPointerHaloPaint2.setDither(true);
         // mPointerHaloPaint.setAlpha(150);
 
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -197,6 +193,11 @@ public class HoloCircleSeekBar extends View {
         mArcColor.setColor(wheel_color);
         mArcColor.setStyle(Style.STROKE);
         mArcColor.setStrokeWidth(mColorWheelStrokeWidth);
+
+        mArcColor2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mArcColor2.setColor(glow_color);
+        mArcColor2.setStyle(Style.STROKE);
+        mArcColor2.setStrokeWidth(mColorWheelStrokeWidth * 1.6f);
 
         Paint mCircleTextColor = new Paint(Paint.ANTI_ALIAS_FLAG);
         mCircleTextColor.setColor(Color.WHITE);
@@ -218,7 +219,7 @@ public class HoloCircleSeekBar extends View {
     }
 
     private void initAttributes(TypedArray a) {
-        mColorWheelStrokeWidth = a.getInteger(
+        mColorWheelStrokeWidth = a.getDimension(
                 R.styleable.HoloCircleSeekBar_wheel_size, COLOR_WHEEL_STROKE_WIDTH_DEF_VALUE);
         mPointerRadius = a.getDimension(
                 R.styleable.HoloCircleSeekBar_pointer_size, POINTER_RADIUS_DEF_VALUE);
@@ -234,6 +235,7 @@ public class HoloCircleSeekBar extends View {
                 .getString(R.styleable.HoloCircleSeekBar_pointer_halo_color);
 
         String text_color_attr = a.getString(R.styleable.HoloCircleSeekBar_text_color);
+        String glow_color_attr = a.getString(R.styleable.HoloCircleSeekBar_glow_color);
 
         text_size = a.getDimensionPixelSize(R.styleable.HoloCircleSeekBar_text_size, TEXT_SIZE_DEFAULT_VALUE);
 
@@ -269,6 +271,19 @@ public class HoloCircleSeekBar extends View {
 
         } else {
             unactive_wheel_color = Color.CYAN;
+        }
+
+
+        if (glow_color_attr != null) {
+            try {
+                glow_color = Color
+                        .parseColor(glow_color_attr);
+            } catch (IllegalArgumentException e) {
+                glow_color = Color.TRANSPARENT;
+            }
+
+        } else {
+            glow_color = Color.TRANSPARENT;
         }
 
         if (pointer_color_attr != null) {
@@ -313,9 +328,17 @@ public class HoloCircleSeekBar extends View {
 
         canvas.translate(mTranslationOffset, mTranslationOffset);
 
+        // Draw the pointer's "halo"
+        canvas.drawCircle(pointerPosition[0], pointerPosition[1],
+                mColorWheelStrokeWidth * 1.70f, mPointerHaloPaint2);
+
         // Draw the color wheel.
         canvas.drawArc(mColorWheelRectangle, start_arc + 270, end_wheel
                 - (start_arc), false, mColorWheelPaint);
+
+        canvas.drawArc(mColorWheelRectangle, start_arc + 270,
+                (arc_finish_radians) > (end_wheel) ? end_wheel - (start_arc)
+                        : arc_finish_radians - start_arc, false, mArcColor2);
 
         canvas.drawArc(mColorWheelRectangle, start_arc + 270,
                 (arc_finish_radians) > (end_wheel) ? end_wheel - (start_arc)
@@ -323,12 +346,12 @@ public class HoloCircleSeekBar extends View {
 
         // Draw the pointer's "halo"
         canvas.drawCircle(pointerPosition[0], pointerPosition[1],
-                mPointerRadius, mPointerHaloPaint);
+                mColorWheelStrokeWidth * 1.40f, mPointerHaloPaint);
 
         // Draw the pointer (the currently selected color) slightly smaller on
         // top.
         canvas.drawCircle(pointerPosition[0], pointerPosition[1],
-                (float) (mPointerRadius / 1.2), mPointerColor);
+                mColorWheelStrokeWidth / 1.40f, mPointerColor);
         textPaint.getTextBounds(text, 0, text.length(), bounds);
         // canvas.drawCircle(mColorWheelRectangle.centerX(),
         // mColorWheelRectangle.centerY(), (bounds.width() / 2) + 5,

@@ -38,7 +38,7 @@ To add the widget, you only need to add this to your xml:
         app:text_size="65sp"
         app:wheel_active_color="@color/wheel_active_color"
         app:wheel_unactive_color="@color/wheel_unactive_color"/>
-
+        
 Don't forget to add this at the root of your View in the xml layout to use the custom attributes:
 
 	xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -53,6 +53,27 @@ You can change some widget components (text size, wheel color, point color, etc)
         app:text_size="65"
         app:wheel_active_color="#00BFFF"
         app:wheel_unactive_color="#FFCCCCCC" 
+        
+You can also add the glow effect : 
+
+	<com.jesusm.holocircleseekbar.lib.HoloCircleSeekBar
+	    android:id="@+id/hc1"
+	    android:layout_width="135dp"
+	    android:layout_height="135dp"
+	    app:max="100"
+	    app:glow_color="#beD8F6FE"
+	    app:pointer_color="#ababab"
+	    app:pointer_halo_color="#00C4FA"
+	    app:pointer_size="20dp"
+	    app:text_color="#555555"
+	    app:text_size="36sp"
+	    app:wheel_size="6dp"
+	    app:show_text="true"
+	    app:wheel_active_color="#00C4FA"
+	    app:wheel_unactive_color="#ababab"
+	    />
+	   
+![image](/images/device-2016-06-24-012040.png)
 
 To get the value of the circle seekbar
 
