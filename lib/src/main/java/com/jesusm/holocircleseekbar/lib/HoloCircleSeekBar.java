@@ -1,5 +1,5 @@
-package com.example.vaibhav.testpoc.ui;
-
+package com.jesusm.holocircleseekbar.lib;
+  
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -16,7 +16,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.vaibhav.testpoc.R;
+import com.example.jesus.lib.R;
 
 public class HoloCircleSeekBar extends View {
 
