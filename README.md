@@ -54,7 +54,7 @@ You can change some widget components (text size, wheel color, point color, etc)
         app:wheel_active_color="#00BFFF"
         app:wheel_unactive_color="#FFCCCCCC" 
         
-You can also add glow effect : 
+You can also add the glow effect : 
 
 	<com.jesusm.holocircleseekbar.lib.HoloCircleSeekBar
 	    android:id="@+id/hc1"
